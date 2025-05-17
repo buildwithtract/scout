@@ -27,7 +27,7 @@ export const minZoomsScout: Partial<Record<MapSourceId, number>> = {
   [MapSourceId.ExtDatagovukBrownfieldLand]: minZoomLevels.md,
   [MapSourceId.ExtDatagovukBuiltUpAreas]: minZoomLevels.md,
   [MapSourceId.ExtDatagovukConservationArea]: minZoomLevels.md,
-  [MapSourceId.ExtDatagovukFloodZone]: minZoomLevels.xxl,
+  [MapSourceId.ExtDatagovukFloodZone]: minZoomLevels.md,
   [MapSourceId.ExtDatagovukGreenBelt]: minZoomLevels.xxl,
   [MapSourceId.ExtDatagovukListedBuildings]: minZoomLevels.md,
   [MapSourceId.ExtDatagovukLocalAuthorities]: minZoomLevels.lg,

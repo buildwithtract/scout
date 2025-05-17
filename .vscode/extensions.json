@@ -5,14 +5,8 @@
   "recommendations": [
     "bradlc.vscode-tailwindcss",
     "esbenp.prettier-vscode",
-    "charliermarsh.ruff",
-    "golang.go",
     "dbaeumer.vscode-eslint",
-    "eamodio.gitlens",
     "github.vscode-github-actions",
-    "ms-python.debugpy",
-    "ms-python.vscode-pylance",
-    "ms-python.python",
     "ms-vscode.makefile-tools",
     "renesaarsoo.sql-formatter-vsc"
   ],
