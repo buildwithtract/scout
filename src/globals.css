@@ -1,0 +1,388 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  @apply outline-brand-primary;
+}
+
+input,
+textarea,
+select,
+button,
+[type='text']:focus,
+input:where(:not([type])):focus,
+[type='email']:focus,
+[type='url']:focus,
+[type='password']:focus,
+[type='number']:focus,
+[type='date']:focus,
+[type='datetime-local']:focus,
+[type='month']:focus,
+[type='search']:focus,
+[type='tel']:focus,
+[type='time']:focus,
+[type='week']:focus,
+[multiple]:focus,
+textarea:focus,
+select:focus {
+  @apply focus:border-brand-primary focus:ring-brand-primary outline-none;
+}
+
+@layer base {
+  :root {
+    --background: 42, 42%, 94%;
+    --foreground: 30, 13%, 19%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 81 29% 51%;
+    --primary-foreground: 240 10% 100%;
+    --secondary: 32 11% 30%;
+    --secondary-foreground: 240 5.9% 100%;
+    --muted: 31, 11%, 90%;
+    --muted-foreground: 30, 13%, 50%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 30, 12%, 80%;
+    --input: 30, 12%, 80%;
+    --ring: 142.1 76.2% 36.3%;
+    --radius: 0.3rem;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+  }
+
+  /* Better way to defined min-h-screen */
+  .min-h-safe-screen {
+    @apply min-h-screen supports-[height:100cqh]:min-h-[100cqh] supports-[height:100dvh]:min-h-[100dvh] supports-[height:100svh]:min-h-[100svh];
+  }
+
+  /* Better way to defined max-h-screen */
+  .max-h-safe-screen {
+    @apply max-h-screen supports-[height:100cqh]:max-h-[100cqh] supports-[height:100dvh]:max-h-[100dvh] supports-[height:100svh]:max-h-[100svh];
+  }
+
+  body {
+    @apply font-body text-brand-brown;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-heading font-normal uppercase;
+  }
+
+  h1 {
+    @apply text-head-1;
+  }
+
+  h2 {
+    @apply text-head-2;
+  }
+
+  h3 {
+    @apply text-head-3;
+  }
+
+  h4 {
+    @apply text-head-4;
+  }
+}
+
+@layer components {
+  .text-12px {
+    @apply text-[0.75rem];
+  }
+  .text-13px {
+    @apply text-[0.8125rem];
+  }
+  .text-14px {
+    @apply text-[0.875rem];
+  }
+  .text-15px {
+    @apply text-[0.9375rem];
+  }
+  .text-16px {
+    @apply text-[1rem];
+  }
+  .text-17px {
+    @apply text-[1.0625rem];
+  }
+  .text-18px {
+    @apply text-[1.125rem];
+  }
+  .text-19px {
+    @apply text-[1.1875rem];
+  }
+  .text-20px {
+    @apply text-[1.25rem];
+  }
+  .text-21px {
+    @apply text-[1.3125rem];
+  }
+  .text-22px {
+    @apply text-[1.375rem];
+  }
+  .text-23px {
+    @apply text-[1.4375rem];
+  }
+  .text-26px {
+    @apply text-[1.625rem];
+  }
+  .text-28px {
+    @apply text-[1.75rem];
+  }
+  .text-32px {
+    @apply text-[2rem];
+  }
+  .text-40px {
+    @apply text-[2.5rem];
+  }
+  .text-52px {
+    @apply text-[3.25rem];
+  }
+
+  .leading-12px {
+    @apply leading-[0.75rem];
+  }
+  .leading-13px {
+    @apply leading-[0.8125rem];
+  }
+  .leading-14px {
+    @apply leading-[0.875rem];
+  }
+  .leading-15px {
+    @apply leading-[0.9375rem];
+  }
+  .leading-16px {
+    @apply leading-[1rem];
+  }
+  .leading-17px {
+    @apply leading-[1.0625rem];
+  }
+  .leading-18px {
+    @apply leading-[1.125rem];
+  }
+  .leading-19px {
+    @apply leading-[1.1875rem];
+  }
+  .leading-20px {
+    @apply leading-[1.25rem];
+  }
+  .leading-21px {
+    @apply leading-[1.3125rem];
+  }
+  .leading-22px {
+    @apply leading-[1.375rem];
+  }
+  .leading-23px {
+    @apply leading-[1.4375rem];
+  }
+  .leading-24px {
+    @apply leading-[1.5rem];
+  }
+  .leading-25px {
+    @apply leading-[1.5625rem];
+  }
+
+  .leading-26px {
+    @apply leading-[1.625rem];
+  }
+
+  .leading-27px {
+    @apply leading-[1.6875rem];
+  }
+
+  .leading-28px {
+    @apply leading-[1.75rem];
+  }
+
+  .leading-29px {
+    @apply leading-[1.8125rem];
+  }
+
+  .leading-30px {
+    @apply leading-[1.875rem];
+  }
+
+  .leading-34px {
+    @apply leading-[2.125rem];
+  }
+
+  .leading-36px {
+    @apply leading-[2.25rem];
+  }
+
+  .leading-37px {
+    @apply leading-[2.3125rem];
+  }
+
+  .leading-40px {
+    @apply leading-[2.5rem];
+  }
+
+  .leading-44px {
+    @apply leading-[2.75rem];
+  }
+
+  .leading-48px {
+    @apply leading-[3rem];
+  }
+
+  .leading-55px {
+    @apply leading-[3.4375rem];
+  }
+
+  .nav-item {
+    @apply font-heading text-[0.9rem] uppercase tracking-wider;
+  }
+
+  .heading-tag {
+    @apply font-accent text-[0.75rem] uppercase tracking-wide;
+  }
+
+  .heading {
+    @apply font-heading font-normal uppercase tracking-wide;
+  }
+
+  .heading-1 {
+    @apply heading text-head-1;
+  }
+
+  .heading-2 {
+    @apply heading text-head-2;
+  }
+
+  .heading-3 {
+    @apply heading text-head-3;
+  }
+
+  .heading-4 {
+    @apply heading text-head-4;
+  }
+
+  .subhead {
+    @apply font-heading;
+  }
+
+  .subhead-1 {
+    @apply subhead text-subhead-1;
+  }
+
+  .subhead-2 {
+    @apply subhead text-subhead-2;
+  }
+
+  .subhead-3 {
+    @apply subhead text-subhead-3;
+  }
+
+  .subhead-4 {
+    @apply subhead text-subhead-4;
+  }
+
+  .accent-large {
+    @apply font-body text-3xl;
+  }
+  /* Breaks a gap in the underline */
+  .accent-large-italics {
+    @apply accent-large italic underline underline-offset-[0.46rem];
+  }
+
+  .accent-small {
+    @apply font-body text-accent-small;
+  }
+
+  .accent-small-italics {
+    @apply accent-small italic;
+  }
+
+  .body-1 {
+    @apply font-body text-base;
+  }
+
+  .body-1-uppercase {
+    @apply body-1 uppercase;
+  }
+
+  .body-1-italics {
+    @apply body-1 italic;
+  }
+
+  .body-1-link {
+    @apply body-1 link;
+  }
+
+  .body-article {
+    @apply text-article font-body;
+  }
+
+  .body-article-italics {
+    @apply body-article italic;
+  }
+
+  .body-article-link {
+    @apply body-article link decoration-1;
+  }
+
+  .body-2 {
+    @apply font-accent text-body-2;
+  }
+
+  .body-2-bold {
+    @apply body-2 font-medium;
+  }
+
+  .body-2-italics {
+    @apply body-2 italic;
+  }
+
+  .body-2-link {
+    @apply body-2 link;
+  }
+
+  .body-footnotes {
+    @apply body-2 text-body-footnotes;
+  }
+
+  .link {
+    @apply hover:text-brand-primary cursor-pointer underline underline-offset-[0.25rem] transition-all duration-100 hover:underline-offset-[0.5rem];
+  }
+
+  .link-brand-brown {
+    @apply link hover:text-brand-brown;
+  }
+
+  .quote {
+    @apply text-quote font-body italic;
+  }
+
+  .button {
+    @apply text-button font-accent uppercase tracking-wide;
+  }
+
+  .mobile-menu-item {
+    @apply hover:text-tints-grey-light border-b-brand-brown border-b-[1px] py-[5px] uppercase;
+  }
+
+  .bg-stripes {
+    background: repeating-linear-gradient(
+      135deg,
+      #fefcf2,
+      #fefcf2 8px,
+      #f4f1e9 8px,
+      #f4f1e9 9px
+    );
+  }
+}

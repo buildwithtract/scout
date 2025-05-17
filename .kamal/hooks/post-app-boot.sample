@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Abort on any error
+set -e
+
+# The hook is executed *locally*. We need to run migrations against the
+# Postgres container that lives on the remote host. That container only
+# listens on 127.0.0.1:5432 inside the server, so we create a temporary
+# SSH tunnel that forwards a free local port to it, then point goose at
+# that port.
+
+echo "Booted app version $KAMAL_VERSION on $KAMAL_HOSTS..."

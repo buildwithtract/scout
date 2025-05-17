@@ -1,0 +1,61 @@
+service: scout
+image: buildwithtract/scout
+
+servers:
+  web:
+    - 157.180.79.13
+
+proxy:
+  ssl: true
+  host: scout-dev.buildwithtract.com
+
+registry:
+  server: ghcr.io
+  username: buildwithtract
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+builder:
+  arch: amd64
+  remote: ssh://root@157.180.79.13
+  secrets:
+    - JWT_SECRET_KEY
+    - NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+    - DNOS_ENW_API_KEY
+    - DNOS_UKPN_API_KEY
+    - DNOS_NGED_API_KEY
+    - DNOS_NPG_API_KEY
+    - DNOS_SPEN_API_KEY
+    - DNOS_SSEN_API_KEY
+  args:
+    NEXT_TELEMETRY_DISABLED: 1
+    NODE_ENV: production
+
+env:
+  clear:
+    NEXT_PUBLIC_GIT_SHA: TODO
+    DATABASE_URL: postgres://postgres:postgres@scout-db:5432/postgres
+  secret:
+    - JWT_SECRET_KEY
+    - NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+    - DNOS_ENW_API_KEY
+    - DNOS_UKPN_API_KEY
+    - DNOS_NGED_API_KEY
+    - DNOS_NPG_API_KEY
+    - DNOS_SPEN_API_KEY
+    - DNOS_SSEN_API_KEY
+
+accessories:
+  db:
+    image: postgis/postgis:17-3.5
+    host: 157.180.79.13
+    port: '127.0.0.1:5432:5432'
+    env:
+      clear:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+        POSTGRES_DB: postgres
+    files:
+      - db/init-schema.sql:/docker-entrypoint-initdb.d/init-schema.sql
+    directories:
+      - data:/var/lib/postgresql/data

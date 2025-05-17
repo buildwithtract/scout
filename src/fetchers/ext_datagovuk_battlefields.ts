@@ -1,0 +1,129 @@
+import {
+  deleteAllExtDatagovukBattlefields,
+  getExtDatagovukBattlefieldForReference,
+  getExtDatagovukBattlefieldLatestImport,
+  newExtDatagovukBattlefieldFromWGS84,
+  partialUpdateExtDatagovukBattlefieldForReference
+} from '@/db'
+import { Client } from 'pg'
+import { DatagovukFetcher } from './ext_datagovuk'
+
+export class ExtDatagovukBattlefields extends DatagovukFetcher<any> {
+  name = 'ext-datagovuk-battlefields'
+
+  constructor(dbClient: Client) {
+    super(dbClient, 'battlefield')
+  }
+
+  protected async getLatestImportDate(): Promise<Date> {
+    const result = await getExtDatagovukBattlefieldLatestImport(this.dbClient)
+    return result?.max ? new Date(result.max) : new Date(0)
+  }
+
+  async insertFeature(
+    feature: GeoJSON.Feature
+  ): Promise<'inserted' | 'updated'> {
+    const reference = feature.properties?.reference
+    if (!reference) {
+      console.warn('Feature missing reference property, skipping')
+      return 'updated'
+    }
+    const name = feature.properties?.name
+    if (!name) {
+      console.warn('Feature missing name property, skipping')
+      return 'updated'
+    }
+    const entryDateStr = feature.properties?.['entry-date']
+    if (!entryDateStr) {
+      console.warn('Feature missing entry-date property, skipping')
+      return 'updated'
+    }
+    const entryDate = new Date(entryDateStr)
+    if (isNaN(entryDate.getTime())) {
+      console.warn(`Invalid entry-date: ${entryDateStr}, skipping`)
+      return 'updated'
+    }
+    const startDateStr = feature.properties?.['start-date']
+    let startDate: Date | null = null
+    if (startDateStr) {
+      startDate = new Date(startDateStr)
+      if (isNaN(startDate.getTime())) {
+        startDate = null
+      }
+    }
+    const endDateStr = feature.properties?.['end-date']
+    let endDate: Date | null = null
+    if (endDateStr) {
+      endDate = new Date(endDateStr)
+      if (isNaN(endDate.getTime())) {
+        endDate = null
+      }
+    }
+    const entity = feature.properties?.entity
+    if (!entity) {
+      console.warn('Feature missing entity property, skipping')
+      return 'updated'
+    }
+    const documentUrl = feature.properties?.['document-url'] || null
+    const documentationUrl = feature.properties?.['documentation-url'] || null
+    const existingFeature = await getExtDatagovukBattlefieldForReference(
+      this.dbClient,
+      { reference }
+    )
+    if (!existingFeature) {
+      await newExtDatagovukBattlefieldFromWGS84(this.dbClient, {
+        geometry: JSON.stringify(feature.geometry),
+        reference,
+        name,
+        entryDate,
+        startDate,
+        endDate,
+        entity,
+        documentUrl,
+        documentationUrl
+      })
+      return 'inserted'
+    } else {
+      await partialUpdateExtDatagovukBattlefieldForReference(this.dbClient, {
+        reference,
+        geometry: JSON.stringify(feature.geometry),
+        name: name !== existingFeature.name ? name : null,
+        entryDate: !this.datesEqual(entryDate, existingFeature.entryDate)
+          ? entryDate
+          : null,
+        startDate: !this.datesEqual(startDate, existingFeature.startDate)
+          ? startDate
+          : null,
+        endDate: !this.datesEqual(endDate, existingFeature.endDate)
+          ? endDate
+          : null,
+        entity: entity !== existingFeature.entity ? entity : null,
+        documentUrl:
+          documentUrl !== existingFeature.documentUrl ? documentUrl : null,
+        documentationUrl:
+          documentationUrl !== existingFeature.documentationUrl
+            ? documentationUrl
+            : null
+      })
+      return 'updated'
+    }
+  }
+
+  private datesEqual(date1: Date | null, date2: Date | null): boolean {
+    if (date1 === null && date2 === null) return true
+    if (date1 === null || date2 === null) return false
+    return date1.getTime() === date2.getTime()
+  }
+
+  async truncate(): Promise<void> {
+    console.info('Truncating battlefield data')
+    try {
+      await deleteAllExtDatagovukBattlefields(this.dbClient)
+      console.info('Truncated battlefield data')
+    } catch (error) {
+      throw new Error(
+        `Error deleting battlefields: ${error instanceof Error ? error.message : String(error)}`
+      )
+    }
+  }
+}

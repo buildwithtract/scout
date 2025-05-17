@@ -1,0 +1,6 @@
+**/node_modules
+**/vendor
+**/.next
+**/registry.terraform.io
+**/.terraform
+io/internal/utils/testdata/*

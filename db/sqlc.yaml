@@ -1,0 +1,83 @@
+version: '2'
+sql:
+  - engine: 'postgresql'
+    queries:
+      - queries/ext_datagovuk_ancient_woodland.sql
+      - queries/ext_datagovuk_aonb.sql
+      - queries/ext_datagovuk_battlefields.sql
+      - queries/ext_datagovuk_brownfield.sql
+      - queries/ext_datagovuk_built_up_areas.sql
+      - queries/ext_datagovuk_conservation_area.sql
+      - queries/ext_datagovuk_educational_establishment.sql
+      - queries/ext_datagovuk_flood_risk_zones.sql
+      - queries/ext_datagovuk_green_belt.sql
+      - queries/ext_datagovuk_heritage_at_risk.sql
+      - queries/ext_datagovuk_heritage_coast.sql
+      - queries/ext_datagovuk_historic_park_gardens.sql
+      - queries/ext_datagovuk_listed_buildings.sql
+      - queries/ext_datagovuk_local_authorities.sql
+      - queries/ext_datagovuk_local_nature_reserve.sql
+      - queries/ext_datagovuk_local_planning_authorities.sql
+      - queries/ext_datagovuk_national_nature_reserves.sql
+      - queries/ext_datagovuk_national_parks.sql
+      - queries/ext_datagovuk_parishes.sql
+      - queries/ext_datagovuk_ramsar.sql
+      - queries/ext_datagovuk_regions.sql
+      - queries/ext_datagovuk_scheduled_monuments.sql
+      - queries/ext_datagovuk_special_areas_of_conservation.sql
+      - queries/ext_datagovuk_special_protection_area.sql
+      - queries/ext_datagovuk_sssi.sql
+      - queries/ext_datagovuk_trees.sql
+      - queries/ext_datagovuk_world_heritage_sites.sql
+      - queries/ext_datagovuk_world_heritage_site_buffer_zone.sql
+      - queries/ext_environmentagency_alc_grades.sql
+      - queries/ext_environmentagency_provisional_alc_grades.sql
+      - queries/ext_enw_132kv_overhead_lines.sql
+      - queries/ext_enw_33kv_overhead_lines.sql
+      - queries/ext_enw_11kv_overhead_lines.sql
+      - queries/ext_enw_6_6kv_overhead_lines.sql
+      - queries/ext_enw_low_voltage_overhead_lines.sql
+      - queries/ext_enw_substations.sql
+      - queries/ext_nget_overhead_lines.sql
+      - queries/ext_nget_substations.sql
+      - queries/ext_nget_towers.sql
+      - queries/ext_naturalengland_nutrient_neutrality_catchments.sql
+      - queries/ext_nged_substations.sql
+      - queries/ext_npg_dnos.sql
+      - queries/ext_npg_extra_high_voltage_lines.sql
+      - queries/ext_npg_high_voltage_overhead_lines.sql
+      - queries/ext_npg_independent_operators.sql
+      - queries/ext_npg_low_voltage_overhead_lines.sql
+      - queries/ext_npg_substations.sql
+      - queries/ext_spen_substations.sql
+      - queries/ext_ssen_transmission_overhead_line_grid.sql
+      - queries/ext_ssen_transmission_overhead_line_supergrid.sql
+      - queries/ext_ssen_transmission_substations_grid.sql
+      - queries/ext_ssen_transmission_substations_supergrid.sql
+      - queries/ext_openstreetmap_healthcare.sql
+      - queries/ext_openstreetmap_public_right_of_way.sql
+      - queries/ext_openstreetmap_public_transport.sql
+      - queries/ext_ukpn_33kv_overhead_lines.sql
+      - queries/ext_ukpn_66kv_overhead_lines.sql
+      - queries/ext_ukpn_132kv_overhead_lines.sql
+      - queries/ext_ukpn_high_voltage_overhead_lines.sql
+      - queries/ext_ukpn_independent_operators.sql
+      - queries/ext_ukpn_substations.sql
+      - queries/fetches.sql
+      - queries/int_powerlines.sql
+      - queries/int_substations.sql
+      - queries/int_independent_operators.sql
+      - queries/planning_applications.sql
+    schema: schema.sql
+    codegen:
+      - out: ../src/db/generated
+        plugin: ts
+        options:
+          runtime: node
+          driver: pg
+
+plugins:
+  - name: ts
+    wasm:
+      url: https://downloads.sqlc.dev/plugin/sqlc-gen-typescript_0.1.3.wasm
+      sha256: 287df8f6cc06377d67ad5ba02c9e0f00c585509881434d15ea8bd9fc751a9368
