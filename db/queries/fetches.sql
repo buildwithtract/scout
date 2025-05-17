@@ -1,3 +1,11 @@
+-- name: GetLatestFetchesForEachDataset :many
+SELECT DISTINCT ON (name)
+    name,
+    error,
+    finished_at
+FROM fetches
+ORDER BY name, finished_at DESC;
+
 -- name: InsertFetch :one
 INSERT INTO
     fetches (name, command)

@@ -13,7 +13,14 @@ import { MapLegend } from '@/components/map-legend'
 import { useUrlPersistedState } from '@/lib/hooks/useUrlPersistedState'
 import { Menu, X } from 'lucide-react'
 import Link from 'next/link'
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
 import { InfoBox } from '../components/info-box'
 import { mapSourcesScout, minZoomsScout } from '../config/map-sources'
 
@@ -149,12 +156,10 @@ const Scout = () => {
     [zoomLevel, layerKeys]
   )
 
-  // Add a function to handle scroll position
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     lastScrollPosition.current = e.currentTarget.scrollTop
-  }
+  }, [])
 
-  // Add an effect to restore scroll position after render
   useEffect(() => {
     if (desktopScrollRef.current) {
       desktopScrollRef.current.scrollTop = lastScrollPosition.current
@@ -232,6 +237,11 @@ const Scout = () => {
             target="_blank"
           >
             Built By Tract
+          </Link>
+        </p>
+        <p>
+          <Link href="/data" className="link">
+            Data
           </Link>
         </p>
       </div>

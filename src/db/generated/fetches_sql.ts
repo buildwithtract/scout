@@ -4,6 +4,35 @@ interface Client {
     query: (config: QueryArrayConfig) => Promise<QueryArrayResult>;
 }
 
+export const getLatestFetchesForEachDatasetQuery = `-- name: GetLatestFetchesForEachDataset :many
+SELECT DISTINCT ON (name)
+    name,
+    error,
+    finished_at
+FROM fetches
+ORDER BY name, finished_at DESC`;
+
+export interface GetLatestFetchesForEachDatasetRow {
+    name: string;
+    error: string | null;
+    finishedAt: Date | null;
+}
+
+export async function getLatestFetchesForEachDataset(client: Client): Promise<GetLatestFetchesForEachDatasetRow[]> {
+    const result = await client.query({
+        text: getLatestFetchesForEachDatasetQuery,
+        values: [],
+        rowMode: "array"
+    });
+    return result.rows.map(row => {
+        return {
+            name: row[0],
+            error: row[1],
+            finishedAt: row[2]
+        };
+    });
+}
+
 export const insertFetchQuery = `-- name: InsertFetch :one
 INSERT INTO
     fetches (name, command)
