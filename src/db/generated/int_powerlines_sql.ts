@@ -23,15 +23,14 @@ WITH
             voltage,
             situation,
             dno,
-            CASE
-                WHEN voltage >= 1000 THEN (voltage / 1000)::int || 'kV' || ' ' || situation
-                ELSE voltage::text || 'V' || ' ' || situation
-            END AS annotation,
             ST_AsMVTGeom (
-                CASE
-                    WHEN ST_GeometryType (geometry_3857) = 'ST_MultiLineString' THEN ST_LineMerge (ST_Force2D (geometry_3857))
-                    ELSE ST_Force2D (geometry_3857)
-                END,
+                ST_Simplify (
+                    ip.geometry_3857,
+                    CASE
+                        WHEN $1 >= 12 THEN 0
+                        ELSE GREATEST(0.5, POWER(2, 20 - $1) / 4)
+                    END
+                ),
                 tile.envelope
             )::geometry AS geometry
         FROM
@@ -39,6 +38,25 @@ WITH
             tile
         WHERE
             ST_Intersects (ST_Force2D (ip.geometry_3857), tile.envelope)
+            AND (
+                (ip.voltage >= 131000) -- Always show 132kV and above, with a buffer
+                OR (
+                    $1 >= 10
+                    AND $1 < 12
+                    AND ip.voltage >= 33000
+                    AND ip.voltage < 131000
+                )
+                OR (
+                    $1 >= 12
+                    AND $1 < 14
+                    AND ip.voltage >= 11000
+                    AND ip.voltage < 131000
+                )
+                OR (
+                    $1 >= 14
+                    AND ip.voltage < 131000
+                )
+            )
     )
 SELECT
     ST_AsMVT (mvtgeom.*)::bytea AS mvt

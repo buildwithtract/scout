@@ -73,13 +73,14 @@ export const HoverInfoBox = ({ features, position }: HoverInfoBoxProps) => {
     if (props.name) keys.push('name')
     if (props.reference) keys.push('reference')
 
-    // Add source-specific properties
     switch (feature.mapSourceId) {
+      case MapSourceId.IntPowerlines:
+        if (props.voltage !== undefined) keys.push('voltage')
+        if (props.dno) keys.push('dno')
+        if (props.situation) keys.push('situation')
+        break
       case MapSourceId.ExtDatagovukParishes:
         if (props.entry_date) keys.push('entry_date')
-        break
-      case MapSourceId.ExtOsContours:
-        if (props.height_m !== undefined) keys.push('height_m')
         break
       case MapSourceId.ExtDatagovukSSSIs:
         if (props.entry_date) keys.push('entry_date')

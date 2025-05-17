@@ -4,112 +4,6 @@ interface Client {
     query: (config: QueryArrayConfig) => Promise<QueryArrayResult>;
 }
 
-export const getExtDatagovukBattlefieldsQuery = `-- name: GetExtDatagovukBattlefields :many
-SELECT
-    uuid, reference, name, entry_date, start_date, end_date, entity, document_url, documentation_url, geometry, geometry_3857, geometry_27700, first_imported_at, last_imported_at
-FROM
-    public.ext_datagovuk_battlefields`;
-
-export interface GetExtDatagovukBattlefieldsRow {
-    uuid: string;
-    reference: string;
-    name: string;
-    entryDate: Date;
-    startDate: Date | null;
-    endDate: Date | null;
-    entity: string;
-    documentUrl: string | null;
-    documentationUrl: string | null;
-    geometry: string;
-    geometry_3857: string;
-    geometry_27700: string;
-    firstImportedAt: Date;
-    lastImportedAt: Date;
-}
-
-export async function getExtDatagovukBattlefields(client: Client): Promise<GetExtDatagovukBattlefieldsRow[]> {
-    const result = await client.query({
-        text: getExtDatagovukBattlefieldsQuery,
-        values: [],
-        rowMode: "array"
-    });
-    return result.rows.map(row => {
-        return {
-            uuid: row[0],
-            reference: row[1],
-            name: row[2],
-            entryDate: row[3],
-            startDate: row[4],
-            endDate: row[5],
-            entity: row[6],
-            documentUrl: row[7],
-            documentationUrl: row[8],
-            geometry: row[9],
-            geometry_3857: row[10],
-            geometry_27700: row[11],
-            firstImportedAt: row[12],
-            lastImportedAt: row[13]
-        };
-    });
-}
-
-export const getExtDatagovukBattlefieldQuery = `-- name: GetExtDatagovukBattlefield :one
-SELECT
-    uuid, reference, name, entry_date, start_date, end_date, entity, document_url, documentation_url, geometry, geometry_3857, geometry_27700, first_imported_at, last_imported_at
-FROM
-    public.ext_datagovuk_battlefields
-WHERE
-    uuid = $1`;
-
-export interface GetExtDatagovukBattlefieldArgs {
-    uuid: string;
-}
-
-export interface GetExtDatagovukBattlefieldRow {
-    uuid: string;
-    reference: string;
-    name: string;
-    entryDate: Date;
-    startDate: Date | null;
-    endDate: Date | null;
-    entity: string;
-    documentUrl: string | null;
-    documentationUrl: string | null;
-    geometry: string;
-    geometry_3857: string;
-    geometry_27700: string;
-    firstImportedAt: Date;
-    lastImportedAt: Date;
-}
-
-export async function getExtDatagovukBattlefield(client: Client, args: GetExtDatagovukBattlefieldArgs): Promise<GetExtDatagovukBattlefieldRow | null> {
-    const result = await client.query({
-        text: getExtDatagovukBattlefieldQuery,
-        values: [args.uuid],
-        rowMode: "array"
-    });
-    if (result.rows.length !== 1) {
-        return null;
-    }
-    const row = result.rows[0];
-    return {
-        uuid: row[0],
-        reference: row[1],
-        name: row[2],
-        entryDate: row[3],
-        startDate: row[4],
-        endDate: row[5],
-        entity: row[6],
-        documentUrl: row[7],
-        documentationUrl: row[8],
-        geometry: row[9],
-        geometry_3857: row[10],
-        geometry_27700: row[11],
-        firstImportedAt: row[12],
-        lastImportedAt: row[13]
-    };
-}
-
 export const getExtDatagovukBattlefieldForReferenceQuery = `-- name: GetExtDatagovukBattlefieldForReference :one
 SELECT
     uuid, reference, name, entry_date, start_date, end_date, entity, document_url, documentation_url, geometry, geometry_3857, geometry_27700, first_imported_at, last_imported_at
@@ -167,131 +61,6 @@ export async function getExtDatagovukBattlefieldForReference(client: Client, arg
     };
 }
 
-export const getExtDatagovukBattlefieldThatIntersectsGeometryQuery = `-- name: GetExtDatagovukBattlefieldThatIntersectsGeometry :one
-SELECT
-    uuid, reference, name, entry_date, start_date, end_date, entity, document_url, documentation_url, geometry, geometry_3857, geometry_27700, first_imported_at, last_imported_at
-FROM
-    public.ext_datagovuk_battlefields
-WHERE
-    ST_Intersects (
-        geometry_3857,
-        ST_GeomFromGeoJSON ($1)::geometry
-    )`;
-
-export interface GetExtDatagovukBattlefieldThatIntersectsGeometryArgs {
-    geometry: string;
-}
-
-export interface GetExtDatagovukBattlefieldThatIntersectsGeometryRow {
-    uuid: string;
-    reference: string;
-    name: string;
-    entryDate: Date;
-    startDate: Date | null;
-    endDate: Date | null;
-    entity: string;
-    documentUrl: string | null;
-    documentationUrl: string | null;
-    geometry: string;
-    geometry_3857: string;
-    geometry_27700: string;
-    firstImportedAt: Date;
-    lastImportedAt: Date;
-}
-
-export async function getExtDatagovukBattlefieldThatIntersectsGeometry(client: Client, args: GetExtDatagovukBattlefieldThatIntersectsGeometryArgs): Promise<GetExtDatagovukBattlefieldThatIntersectsGeometryRow | null> {
-    const result = await client.query({
-        text: getExtDatagovukBattlefieldThatIntersectsGeometryQuery,
-        values: [args.geometry],
-        rowMode: "array"
-    });
-    if (result.rows.length !== 1) {
-        return null;
-    }
-    const row = result.rows[0];
-    return {
-        uuid: row[0],
-        reference: row[1],
-        name: row[2],
-        entryDate: row[3],
-        startDate: row[4],
-        endDate: row[5],
-        entity: row[6],
-        documentUrl: row[7],
-        documentationUrl: row[8],
-        geometry: row[9],
-        geometry_3857: row[10],
-        geometry_27700: row[11],
-        firstImportedAt: row[12],
-        lastImportedAt: row[13]
-    };
-}
-
-export const getExtDatagovukBattlefieldsWithin1KmOfGeometryQuery = `-- name: GetExtDatagovukBattlefieldsWithin1KmOfGeometry :many
-SELECT
-    uuid, reference, name, entry_date, start_date, end_date, entity, document_url, documentation_url, geometry, geometry_3857, geometry_27700, first_imported_at, last_imported_at
-FROM
-    public.ext_datagovuk_battlefields
-WHERE
-    geometry_3857 && ST_Expand (ST_GeomFromGeoJSON ($1)::geometry, 1000)
-    AND ST_DWithin (
-        geometry_3857,
-        ST_GeomFromGeoJSON ($2)::geometry,
-        1000
-    )
-    AND NOT ST_Intersects (
-        geometry_3857,
-        ST_GeomFromGeoJSON ($2)::geometry
-    )`;
-
-export interface GetExtDatagovukBattlefieldsWithin1KmOfGeometryArgs {
-    stGeomfromgeojson: string;
-    geometry: string;
-}
-
-export interface GetExtDatagovukBattlefieldsWithin1KmOfGeometryRow {
-    uuid: string;
-    reference: string;
-    name: string;
-    entryDate: Date;
-    startDate: Date | null;
-    endDate: Date | null;
-    entity: string;
-    documentUrl: string | null;
-    documentationUrl: string | null;
-    geometry: string;
-    geometry_3857: string;
-    geometry_27700: string;
-    firstImportedAt: Date;
-    lastImportedAt: Date;
-}
-
-export async function getExtDatagovukBattlefieldsWithin1KmOfGeometry(client: Client, args: GetExtDatagovukBattlefieldsWithin1KmOfGeometryArgs): Promise<GetExtDatagovukBattlefieldsWithin1KmOfGeometryRow[]> {
-    const result = await client.query({
-        text: getExtDatagovukBattlefieldsWithin1KmOfGeometryQuery,
-        values: [args.stGeomfromgeojson, args.geometry],
-        rowMode: "array"
-    });
-    return result.rows.map(row => {
-        return {
-            uuid: row[0],
-            reference: row[1],
-            name: row[2],
-            entryDate: row[3],
-            startDate: row[4],
-            endDate: row[5],
-            entity: row[6],
-            documentUrl: row[7],
-            documentationUrl: row[8],
-            geometry: row[9],
-            geometry_3857: row[10],
-            geometry_27700: row[11],
-            firstImportedAt: row[12],
-            lastImportedAt: row[13]
-        };
-    });
-}
-
 export const getExtDatagovukBattlefieldLatestImportQuery = `-- name: GetExtDatagovukBattlefieldLatestImport :one
 SELECT
     MAX(last_imported_at)
@@ -314,6 +83,66 @@ export async function getExtDatagovukBattlefieldLatestImport(client: Client): Pr
     const row = result.rows[0];
     return {
         max: row[0]
+    };
+}
+
+export const getExtDatagovukBattlefieldsInMvtQuery = `-- name: GetExtDatagovukBattlefieldsInMvt :one
+WITH
+    tile AS (
+        SELECT
+            ST_TileEnvelope (
+                $1::int,
+                $2::int,
+                $3::int
+            ) as envelope
+    ),
+    mvtgeom AS (
+        SELECT
+            uuid,
+            name,
+            ST_AsMVTGeom (
+                ST_Simplify (
+                    ip.geometry_3857,
+                    CASE
+                        WHEN $1 >= 12 THEN 0
+                        ELSE GREATEST(0.5, POWER(2, 20 - $1) / 4)
+                    END
+                ),
+                tile.envelope
+            )::geometry AS geometry
+        FROM
+            public.ext_datagovuk_battlefields ip,
+            tile
+        WHERE
+            ST_Intersects (ip.geometry_3857, tile.envelope)
+    )
+SELECT
+    ST_AsMVT (mvtgeom.*)::bytea AS mvt
+FROM
+    mvtgeom`;
+
+export interface GetExtDatagovukBattlefieldsInMvtArgs {
+    z: number;
+    x: number;
+    y: number;
+}
+
+export interface GetExtDatagovukBattlefieldsInMvtRow {
+    mvt: Buffer;
+}
+
+export async function getExtDatagovukBattlefieldsInMvt(client: Client, args: GetExtDatagovukBattlefieldsInMvtArgs): Promise<GetExtDatagovukBattlefieldsInMvtRow | null> {
+    const result = await client.query({
+        text: getExtDatagovukBattlefieldsInMvtQuery,
+        values: [args.z, args.x, args.y],
+        rowMode: "array"
+    });
+    if (result.rows.length !== 1) {
+        return null;
+    }
+    const row = result.rows[0];
+    return {
+        mvt: row[0]
     };
 }
 
@@ -418,115 +247,6 @@ export async function deleteAllExtDatagovukBattlefields(client: Client): Promise
         text: deleteAllExtDatagovukBattlefieldsQuery,
         values: [],
         rowMode: "array"
-    });
-}
-
-export const getExtDatagovukBattlefieldsInMvtQuery = `-- name: GetExtDatagovukBattlefieldsInMvt :one
-WITH
-    tile AS (
-        SELECT
-            ST_TileEnvelope (
-                $1::int,
-                $2::int,
-                $3::int
-            ) as envelope
-    ),
-    mvtgeom AS (
-        SELECT
-            uuid,
-            name,
-            ST_AsMVTGeom (ip.geometry_3857, tile.envelope)::geometry AS geometry
-        FROM
-            public.ext_datagovuk_battlefields ip,
-            tile
-        WHERE
-            ST_Intersects (ip.geometry_3857, tile.envelope)
-    )
-SELECT
-    ST_AsMVT (mvtgeom.*)::bytea AS mvt
-FROM
-    mvtgeom`;
-
-export interface GetExtDatagovukBattlefieldsInMvtArgs {
-    z: number;
-    x: number;
-    y: number;
-}
-
-export interface GetExtDatagovukBattlefieldsInMvtRow {
-    mvt: Buffer;
-}
-
-export async function getExtDatagovukBattlefieldsInMvt(client: Client, args: GetExtDatagovukBattlefieldsInMvtArgs): Promise<GetExtDatagovukBattlefieldsInMvtRow | null> {
-    const result = await client.query({
-        text: getExtDatagovukBattlefieldsInMvtQuery,
-        values: [args.z, args.x, args.y],
-        rowMode: "array"
-    });
-    if (result.rows.length !== 1) {
-        return null;
-    }
-    const row = result.rows[0];
-    return {
-        mvt: row[0]
-    };
-}
-
-export const getExtDatagovukBattlefieldIntersectingGeometryQuery = `-- name: GetExtDatagovukBattlefieldIntersectingGeometry :many
-SELECT
-    uuid, reference, name, entry_date, start_date, end_date, entity, document_url, documentation_url, geometry, geometry_3857, geometry_27700, first_imported_at, last_imported_at
-FROM
-    public.ext_datagovuk_battlefields
-WHERE
-    ST_Intersects (
-        geometry,
-        ST_GeomFromGeoJSON ($1)::geometry
-    )`;
-
-export interface GetExtDatagovukBattlefieldIntersectingGeometryArgs {
-    geometry: string;
-}
-
-export interface GetExtDatagovukBattlefieldIntersectingGeometryRow {
-    uuid: string;
-    reference: string;
-    name: string;
-    entryDate: Date;
-    startDate: Date | null;
-    endDate: Date | null;
-    entity: string;
-    documentUrl: string | null;
-    documentationUrl: string | null;
-    geometry: string;
-    geometry_3857: string;
-    geometry_27700: string;
-    firstImportedAt: Date;
-    lastImportedAt: Date;
-}
-
-export async function getExtDatagovukBattlefieldIntersectingGeometry(client: Client, args: GetExtDatagovukBattlefieldIntersectingGeometryArgs): Promise<GetExtDatagovukBattlefieldIntersectingGeometryRow[]> {
-    const result = await client.query({
-        text: getExtDatagovukBattlefieldIntersectingGeometryQuery,
-        values: [args.geometry],
-        rowMode: "array"
-    });
-    return result.rows.map(row => {
-        return {
-            uuid: row[0],
-            reference: row[1],
-            name: row[2],
-            entryDate: row[3],
-            startDate: row[4],
-            endDate: row[5],
-            entity: row[6],
-            documentUrl: row[7],
-            documentationUrl: row[8],
-            geometry: row[9],
-            geometry_3857: row[10],
-            geometry_27700: row[11],
-            firstImportedAt: row[12],
-            lastImportedAt: row[13]
-        };
     });
 }
 

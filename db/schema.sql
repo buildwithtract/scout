@@ -2997,6 +2997,132 @@ CREATE UNIQUE INDEX ext_ukpn_substations_uuid ON public.ext_ukpn_substations USI
 
 
 --
+-- Name: int_independent_operators_dno_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX int_independent_operators_dno_idx ON public.int_independent_operators USING btree (dno);
+
+
+--
+-- Name: int_independent_operators_geometry_3857_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX int_independent_operators_geometry_3857_idx ON public.int_independent_operators USING gist (geometry_3857);
+
+
+--
+-- Name: int_independent_operators_geometry_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX int_independent_operators_geometry_idx ON public.int_independent_operators USING gist (geometry);
+
+
+--
+-- Name: int_independent_operators_name_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX int_independent_operators_name_idx ON public.int_independent_operators USING btree (name);
+
+
+--
+-- Name: int_independent_operators_uuid_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX int_independent_operators_uuid_idx ON public.int_independent_operators USING btree (uuid);
+
+
+--
+-- Name: int_powerlines_dno_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX int_powerlines_dno_idx ON public.int_powerlines USING btree (dno);
+
+
+--
+-- Name: int_powerlines_geometry_3857_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX int_powerlines_geometry_3857_idx ON public.int_powerlines USING gist (geometry_3857);
+
+
+--
+-- Name: int_powerlines_geometry_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX int_powerlines_geometry_idx ON public.int_powerlines USING gist (geometry);
+
+
+--
+-- Name: int_powerlines_situation_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX int_powerlines_situation_idx ON public.int_powerlines USING btree (situation);
+
+
+--
+-- Name: int_powerlines_uuid_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX int_powerlines_uuid_idx ON public.int_powerlines USING btree (uuid);
+
+
+--
+-- Name: int_powerlines_voltage_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX int_powerlines_voltage_idx ON public.int_powerlines USING btree (voltage);
+
+
+--
+-- Name: int_substations_dno_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX int_substations_dno_idx ON public.int_substations USING btree (dno);
+
+
+--
+-- Name: int_substations_geometry_3857_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX int_substations_geometry_3857_idx ON public.int_substations USING gist (geometry_3857);
+
+
+--
+-- Name: int_substations_geometry_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX int_substations_geometry_idx ON public.int_substations USING gist (geometry);
+
+
+--
+-- Name: int_substations_name_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX int_substations_name_idx ON public.int_substations USING btree (name);
+
+
+--
+-- Name: int_substations_number_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX int_substations_number_idx ON public.int_substations USING btree (number);
+
+
+--
+-- Name: int_substations_uuid_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX int_substations_uuid_idx ON public.int_substations USING btree (uuid);
+
+
+--
+-- Name: int_substations_voltage_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX int_substations_voltage_idx ON public.int_substations USING btree (voltage);
+
+
+--
 -- Name: ext_datagovuk_ancient_woodland transform_geometry_trigger; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -3418,6 +3544,7 @@ SET row_security = off;
 INSERT INTO public.goose_db_version ("version_id", "is_applied") VALUES (0, true);
 INSERT INTO public.goose_db_version ("version_id", "is_applied") VALUES (20250423092753, true);
 INSERT INTO public.goose_db_version ("version_id", "is_applied") VALUES (20250517123430, true);
+INSERT INTO public.goose_db_version ("version_id", "is_applied") VALUES (20250517154514, true);
 
 
 --

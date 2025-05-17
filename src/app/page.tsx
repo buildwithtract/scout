@@ -3,7 +3,6 @@
 import House from '@/assets/House.svg'
 import { Button } from '@/components/buttons'
 import {
-  amenityGroup,
   gridInfrastructureGroup,
   MapSourceId,
   planningDesignationGroup
@@ -204,11 +203,7 @@ const Scout = () => {
 
         <MapLegend
           twoWayToggle={true}
-          legendGroups={[
-            planningDesignationGroup,
-            gridInfrastructureGroup,
-            amenityGroup
-          ]}
+          legendGroups={[planningDesignationGroup, gridInfrastructureGroup]}
           legendKeys={activeLegendKeys}
           visible={layerKeysVisible}
           setVisible={setLayerKeysVisible}

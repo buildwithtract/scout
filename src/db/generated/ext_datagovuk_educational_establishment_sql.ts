@@ -4,94 +4,20 @@ interface Client {
     query: (config: QueryArrayConfig) => Promise<QueryArrayResult>;
 }
 
-export const getExtDatagovukEducationalEstablishmentsQuery = `-- name: GetExtDatagovukEducationalEstablishments :many
+export const getExtDatagovukEducationalEstablishmentLatestImportQuery = `-- name: GetExtDatagovukEducationalEstablishmentLatestImport :one
 SELECT
-    uuid, reference, uprn, name, status, capacity, establishment_type, open_date, entry_date, start_date, end_date, geometry, geometry_3857, geometry_27700, first_imported_at, last_imported_at
+    MAX(last_imported_at)
 FROM
     public.ext_datagovuk_educational_establishment`;
 
-export interface GetExtDatagovukEducationalEstablishmentsRow {
-    uuid: string;
-    reference: string;
-    uprn: string;
-    name: string;
-    status: string;
-    capacity: number | null;
-    establishmentType: string;
-    openDate: Date | null;
-    entryDate: Date;
-    startDate: Date | null;
-    endDate: Date | null;
-    geometry: string;
-    geometry_3857: string;
-    geometry_27700: string;
-    firstImportedAt: Date;
-    lastImportedAt: Date;
+export interface GetExtDatagovukEducationalEstablishmentLatestImportRow {
+    max: string;
 }
 
-export async function getExtDatagovukEducationalEstablishments(client: Client): Promise<GetExtDatagovukEducationalEstablishmentsRow[]> {
+export async function getExtDatagovukEducationalEstablishmentLatestImport(client: Client): Promise<GetExtDatagovukEducationalEstablishmentLatestImportRow | null> {
     const result = await client.query({
-        text: getExtDatagovukEducationalEstablishmentsQuery,
+        text: getExtDatagovukEducationalEstablishmentLatestImportQuery,
         values: [],
-        rowMode: "array"
-    });
-    return result.rows.map(row => {
-        return {
-            uuid: row[0],
-            reference: row[1],
-            uprn: row[2],
-            name: row[3],
-            status: row[4],
-            capacity: row[5],
-            establishmentType: row[6],
-            openDate: row[7],
-            entryDate: row[8],
-            startDate: row[9],
-            endDate: row[10],
-            geometry: row[11],
-            geometry_3857: row[12],
-            geometry_27700: row[13],
-            firstImportedAt: row[14],
-            lastImportedAt: row[15]
-        };
-    });
-}
-
-export const getExtDatagovukEducationalEstablishmentQuery = `-- name: GetExtDatagovukEducationalEstablishment :one
-SELECT
-    uuid, reference, uprn, name, status, capacity, establishment_type, open_date, entry_date, start_date, end_date, geometry, geometry_3857, geometry_27700, first_imported_at, last_imported_at
-FROM
-    public.ext_datagovuk_educational_establishment
-WHERE
-    uuid = $1`;
-
-export interface GetExtDatagovukEducationalEstablishmentArgs {
-    uuid: string;
-}
-
-export interface GetExtDatagovukEducationalEstablishmentRow {
-    uuid: string;
-    reference: string;
-    uprn: string;
-    name: string;
-    status: string;
-    capacity: number | null;
-    establishmentType: string;
-    openDate: Date | null;
-    entryDate: Date;
-    startDate: Date | null;
-    endDate: Date | null;
-    geometry: string;
-    geometry_3857: string;
-    geometry_27700: string;
-    firstImportedAt: Date;
-    lastImportedAt: Date;
-}
-
-export async function getExtDatagovukEducationalEstablishment(client: Client, args: GetExtDatagovukEducationalEstablishmentArgs): Promise<GetExtDatagovukEducationalEstablishmentRow | null> {
-    const result = await client.query({
-        text: getExtDatagovukEducationalEstablishmentQuery,
-        values: [args.uuid],
         rowMode: "array"
     });
     if (result.rows.length !== 1) {
@@ -99,22 +25,7 @@ export async function getExtDatagovukEducationalEstablishment(client: Client, ar
     }
     const row = result.rows[0];
     return {
-        uuid: row[0],
-        reference: row[1],
-        uprn: row[2],
-        name: row[3],
-        status: row[4],
-        capacity: row[5],
-        establishmentType: row[6],
-        openDate: row[7],
-        entryDate: row[8],
-        startDate: row[9],
-        endDate: row[10],
-        geometry: row[11],
-        geometry_3857: row[12],
-        geometry_27700: row[13],
-        firstImportedAt: row[14],
-        lastImportedAt: row[15]
+        max: row[0]
     };
 }
 
@@ -179,44 +90,55 @@ export async function getExtDatagovukEducationalEstablishmentForReference(client
     };
 }
 
-export const getExtDatagovukEducationalEstablishmentThatIntersectsGeometryQuery = `-- name: GetExtDatagovukEducationalEstablishmentThatIntersectsGeometry :one
+export const getExtDatagovukEducationalEstablishmentsInMvtQuery = `-- name: GetExtDatagovukEducationalEstablishmentsInMvt :one
+WITH
+    tile AS (
+        SELECT
+            ST_TileEnvelope (
+                $1::int,
+                $2::int,
+                $3::int
+            ) as envelope
+    ),
+    mvtgeom AS (
+        SELECT
+            uuid,
+            name || ' (Capacity: ' || capacity || ')' AS annotation,
+            ST_AsMVTGeom (
+                ST_Simplify (
+                    ip.geometry_3857,
+                    CASE
+                        WHEN $1 >= 12 THEN 0
+                        ELSE GREATEST(0.5, POWER(2, 20 - $1) / 4)
+                    END
+                ),
+                tile.envelope
+            )::geometry AS geometry
+        FROM
+            public.ext_datagovuk_educational_establishment ip,
+            tile
+        WHERE
+            ST_Intersects (ip.geometry_3857, tile.envelope)
+    )
 SELECT
-    uuid, reference, uprn, name, status, capacity, establishment_type, open_date, entry_date, start_date, end_date, geometry, geometry_3857, geometry_27700, first_imported_at, last_imported_at
+    ST_AsMVT (mvtgeom.*)::bytea AS mvt
 FROM
-    public.ext_datagovuk_educational_establishment
-WHERE
-    ST_Intersects (
-        geometry,
-        ST_GeomFromGeoJSON ($1)::geometry
-    )`;
+    mvtgeom`;
 
-export interface GetExtDatagovukEducationalEstablishmentThatIntersectsGeometryArgs {
-    geometry: string;
+export interface GetExtDatagovukEducationalEstablishmentsInMvtArgs {
+    z: number;
+    x: number;
+    y: number;
 }
 
-export interface GetExtDatagovukEducationalEstablishmentThatIntersectsGeometryRow {
-    uuid: string;
-    reference: string;
-    uprn: string;
-    name: string;
-    status: string;
-    capacity: number | null;
-    establishmentType: string;
-    openDate: Date | null;
-    entryDate: Date;
-    startDate: Date | null;
-    endDate: Date | null;
-    geometry: string;
-    geometry_3857: string;
-    geometry_27700: string;
-    firstImportedAt: Date;
-    lastImportedAt: Date;
+export interface GetExtDatagovukEducationalEstablishmentsInMvtRow {
+    mvt: Buffer;
 }
 
-export async function getExtDatagovukEducationalEstablishmentThatIntersectsGeometry(client: Client, args: GetExtDatagovukEducationalEstablishmentThatIntersectsGeometryArgs): Promise<GetExtDatagovukEducationalEstablishmentThatIntersectsGeometryRow | null> {
+export async function getExtDatagovukEducationalEstablishmentsInMvt(client: Client, args: GetExtDatagovukEducationalEstablishmentsInMvtArgs): Promise<GetExtDatagovukEducationalEstablishmentsInMvtRow | null> {
     const result = await client.query({
-        text: getExtDatagovukEducationalEstablishmentThatIntersectsGeometryQuery,
-        values: [args.geometry],
+        text: getExtDatagovukEducationalEstablishmentsInMvtQuery,
+        values: [args.z, args.x, args.y],
         rowMode: "array"
     });
     if (result.rows.length !== 1) {
@@ -224,47 +146,7 @@ export async function getExtDatagovukEducationalEstablishmentThatIntersectsGeome
     }
     const row = result.rows[0];
     return {
-        uuid: row[0],
-        reference: row[1],
-        uprn: row[2],
-        name: row[3],
-        status: row[4],
-        capacity: row[5],
-        establishmentType: row[6],
-        openDate: row[7],
-        entryDate: row[8],
-        startDate: row[9],
-        endDate: row[10],
-        geometry: row[11],
-        geometry_3857: row[12],
-        geometry_27700: row[13],
-        firstImportedAt: row[14],
-        lastImportedAt: row[15]
-    };
-}
-
-export const getExtDatagovukEducationalEstablishmentLatestImportQuery = `-- name: GetExtDatagovukEducationalEstablishmentLatestImport :one
-SELECT
-    MAX(last_imported_at)
-FROM
-    public.ext_datagovuk_educational_establishment`;
-
-export interface GetExtDatagovukEducationalEstablishmentLatestImportRow {
-    max: string;
-}
-
-export async function getExtDatagovukEducationalEstablishmentLatestImport(client: Client): Promise<GetExtDatagovukEducationalEstablishmentLatestImportRow | null> {
-    const result = await client.query({
-        text: getExtDatagovukEducationalEstablishmentLatestImportQuery,
-        values: [],
-        rowMode: "array"
-    });
-    if (result.rows.length !== 1) {
-        return null;
-    }
-    const row = result.rows[0];
-    return {
-        max: row[0]
+        mvt: row[0]
     };
 }
 
@@ -375,127 +257,6 @@ export async function deleteAllExtDatagovukEducationalEstablishments(client: Cli
         text: deleteAllExtDatagovukEducationalEstablishmentsQuery,
         values: [],
         rowMode: "array"
-    });
-}
-
-export const getExtDatagovukEducationalEstablishmentsInMvtQuery = `-- name: GetExtDatagovukEducationalEstablishmentsInMvt :one
-WITH
-    tile AS (
-        SELECT
-            ST_TileEnvelope (
-                $1::int,
-                $2::int,
-                $3::int
-            ) as envelope
-    ),
-    mvtgeom AS (
-        SELECT
-            uuid,
-            name || ' (Capacity: ' || capacity || ')' AS annotation,
-            ST_AsMVTGeom (ip.geometry_3857, tile.envelope)::geometry AS geometry
-        FROM
-            public.ext_datagovuk_educational_establishment ip,
-            tile
-        WHERE
-            ST_Intersects (ip.geometry_3857, tile.envelope)
-    )
-SELECT
-    ST_AsMVT (mvtgeom.*)::bytea AS mvt
-FROM
-    mvtgeom`;
-
-export interface GetExtDatagovukEducationalEstablishmentsInMvtArgs {
-    z: number;
-    x: number;
-    y: number;
-}
-
-export interface GetExtDatagovukEducationalEstablishmentsInMvtRow {
-    mvt: Buffer;
-}
-
-export async function getExtDatagovukEducationalEstablishmentsInMvt(client: Client, args: GetExtDatagovukEducationalEstablishmentsInMvtArgs): Promise<GetExtDatagovukEducationalEstablishmentsInMvtRow | null> {
-    const result = await client.query({
-        text: getExtDatagovukEducationalEstablishmentsInMvtQuery,
-        values: [args.z, args.x, args.y],
-        rowMode: "array"
-    });
-    if (result.rows.length !== 1) {
-        return null;
-    }
-    const row = result.rows[0];
-    return {
-        mvt: row[0]
-    };
-}
-
-export const getNearestExtDatagovukEducationalEstablishmentsQuery = `-- name: GetNearestExtDatagovukEducationalEstablishments :many
-SELECT
-    uuid, reference, uprn, name, status, capacity, establishment_type, open_date, entry_date, start_date, end_date, geometry, geometry_3857, geometry_27700, first_imported_at, last_imported_at,
-    ST_Distance (
-        geometry::geography,
-        ST_GeomFromGeoJSON ($1)::geography
-    )::float AS distance
-FROM
-    public.ext_datagovuk_educational_establishment
-WHERE
-    status = '1'
-ORDER BY
-    distance ASC
-LIMIT
-    $2`;
-
-export interface GetNearestExtDatagovukEducationalEstablishmentsArgs {
-    geometry: string;
-    numResults: string;
-}
-
-export interface GetNearestExtDatagovukEducationalEstablishmentsRow {
-    uuid: string;
-    reference: string;
-    uprn: string;
-    name: string;
-    status: string;
-    capacity: number | null;
-    establishmentType: string;
-    openDate: Date | null;
-    entryDate: Date;
-    startDate: Date | null;
-    endDate: Date | null;
-    geometry: string;
-    geometry_3857: string;
-    geometry_27700: string;
-    firstImportedAt: Date;
-    lastImportedAt: Date;
-    distance: number;
-}
-
-export async function getNearestExtDatagovukEducationalEstablishments(client: Client, args: GetNearestExtDatagovukEducationalEstablishmentsArgs): Promise<GetNearestExtDatagovukEducationalEstablishmentsRow[]> {
-    const result = await client.query({
-        text: getNearestExtDatagovukEducationalEstablishmentsQuery,
-        values: [args.geometry, args.numResults],
-        rowMode: "array"
-    });
-    return result.rows.map(row => {
-        return {
-            uuid: row[0],
-            reference: row[1],
-            uprn: row[2],
-            name: row[3],
-            status: row[4],
-            capacity: row[5],
-            establishmentType: row[6],
-            openDate: row[7],
-            entryDate: row[8],
-            startDate: row[9],
-            endDate: row[10],
-            geometry: row[11],
-            geometry_3857: row[12],
-            geometry_27700: row[13],
-            firstImportedAt: row[14],
-            lastImportedAt: row[15],
-            distance: row[16]
-        };
     });
 }
 

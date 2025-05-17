@@ -19,7 +19,6 @@ export enum MapSourceId {
   ExtDatagovukScheduledMonuments = 'ext-datagovuk-scheduled-monuments',
   ExtDatagovukSSSIs = 'ext-datagovuk-sssis',
   ExtDatagovukWorldHeritageSites = 'ext-datagovuk-world-heritage-sites',
-  ExtOsContours = 'ext-os-contours',
   ExtDatagovukFloodZone = 'ext_datagovuk_flood_risk_zones',
   ExtDatagovukNationalNatureReserves = 'ext-datagovuk-national-nature-reserves',
   ExtDatagovukWorldHeritageSiteBufferZones = 'ext-datagovuk-world-heritage-site-buffer-zones',
@@ -35,15 +34,8 @@ export enum MapSourceId {
   ExtDatagovukEducationalEstablishments = 'ext-datagovuk-educational-establishment',
   ExtEnvironmentagencyAlcGrades = 'ext-environmentagency-alc-grades',
   ExtEnvironmentagencyProvisionalAlcGrades = 'ext-environmentagency-provisional-alc-grades',
-  ExtOpenstreetmapPublicRightOfWay = 'ext-openstreetmap-public-right-of-way',
-  ExtOpenstreetmapPublicRightOfWayFootpath = 'ext-openstreetmap-public-right-of-way-footpath',
-  ExtOpenstreetmapPublicRightOfWayBridleway = 'ext-openstreetmap-public-right-of-way-bridleway',
-  ExtOpenstreetmapPublicRightOfWayByway = 'ext-openstreetmap-public-right-of-way-byway',
   ExtNaturalEnglandNutrientNeutralityCatchments = 'ext-naturalengland-nutrient-neutrality-catchments',
   ExtNpgDnos = 'ext-npg-dnos',
-  ExtOpenstreetmapPublicTransportBusStop = 'ext-openstreetmap-public-transport-bus-stop',
-  ExtOpenstreetmapPublicTransportTrainStation = 'ext-openstreetmap-public-transport-train-station',
-  ExtOpenstreetmapHealthcareDoctor = 'ext-openstreetmap-healthcare-doctor',
   ExtPlanningApplications = 'ext-planning-applications',
   IntIndependentOperators = 'int-independent-operators',
   IntPowerlines = 'int-powerlines',
@@ -80,16 +72,8 @@ export const MapSourceOrder: MapSourceId[] = [
   MapSourceId.ExtEnvironmentagencyAlcGrades,
   MapSourceId.ExtEnvironmentagencyProvisionalAlcGrades,
   MapSourceId.ExtNpgDnos,
-  MapSourceId.ExtOsContours,
-  MapSourceId.ExtOpenstreetmapPublicRightOfWay,
-  MapSourceId.ExtOpenstreetmapPublicRightOfWayFootpath,
-  MapSourceId.ExtOpenstreetmapPublicRightOfWayBridleway,
-  MapSourceId.ExtOpenstreetmapPublicRightOfWayByway,
   MapSourceId.ExtDatagovukTrees,
-  MapSourceId.ExtOpenstreetmapPublicTransportBusStop,
-  MapSourceId.ExtOpenstreetmapPublicTransportTrainStation,
   MapSourceId.ExtDatagovukEducationalEstablishments,
-  MapSourceId.ExtOpenstreetmapHealthcareDoctor,
   MapSourceId.ExtDatagovukListedBuildings,
   MapSourceId.ExtPlanningApplications,
   MapSourceId.IntIndependentOperators,
@@ -522,21 +506,6 @@ const mapSourcesBase: Record<MapSourceId, MapSourceFoundation> = {
     name: 'Ancient Woodlands',
     fill: '#BEEDAA'
   }),
-  [MapSourceId.ExtOsContours]: {
-    ...mapLayerProps({
-      type: 'line',
-      id: MapSourceId.ExtOsContours,
-      name: 'Contours',
-      fill: '#000000'
-    }),
-    line: {
-      default: {
-        color: '#000000', // bg-[#ff0000]
-        opacity: 1,
-        width: 1
-      }
-    }
-  },
   [MapSourceId.ExtDatagovukSpecialProtectionArea]: mapLayerProps({
     type: 'polygon',
     id: MapSourceId.ExtDatagovukSpecialProtectionArea,
@@ -587,30 +556,6 @@ const mapSourcesBase: Record<MapSourceId, MapSourceFoundation> = {
     fill: '#00ff00',
     line: '#00e600'
   }),
-  [MapSourceId.ExtOpenstreetmapPublicRightOfWay]: mapLayerProps({
-    type: 'line',
-    id: MapSourceId.ExtOpenstreetmapPublicRightOfWay,
-    name: 'Public Rights of Way',
-    fill: '#ff339f'
-  }),
-  [MapSourceId.ExtOpenstreetmapPublicRightOfWayFootpath]: mapLayerProps({
-    type: 'line',
-    id: MapSourceId.ExtOpenstreetmapPublicRightOfWayFootpath,
-    name: 'Public Footpath',
-    fill: '#6CD4FF'
-  }),
-  [MapSourceId.ExtOpenstreetmapPublicRightOfWayBridleway]: mapLayerProps({
-    type: 'line',
-    id: MapSourceId.ExtOpenstreetmapPublicRightOfWayBridleway,
-    name: 'Public Bridleway',
-    fill: '#ff339f'
-  }),
-  [MapSourceId.ExtOpenstreetmapPublicRightOfWayByway]: mapLayerProps({
-    type: 'line',
-    id: MapSourceId.ExtOpenstreetmapPublicRightOfWayByway,
-    name: 'Public Byway',
-    fill: '#ff9f33'
-  }),
   [MapSourceId.ExtDatagovukTrees]: mapLayerProps({
     type: 'point',
     id: MapSourceId.ExtDatagovukTrees,
@@ -622,26 +567,6 @@ const mapSourcesBase: Record<MapSourceId, MapSourceFoundation> = {
     id: MapSourceId.ExtDatagovukEducationalEstablishments,
     name: 'Educational Establishments',
     fill: '#ff009f'
-  }),
-  [MapSourceId.ExtOpenstreetmapPublicTransportBusStop]: mapLayerProps({
-    type: 'point',
-    id: MapSourceId.ExtOpenstreetmapPublicTransportBusStop,
-    name: 'Bus Stops',
-    fill: '#6060ff',
-    line: '#f0f0ff'
-  }),
-  [MapSourceId.ExtOpenstreetmapPublicTransportTrainStation]: mapLayerProps({
-    type: 'point',
-    id: MapSourceId.ExtOpenstreetmapPublicTransportTrainStation,
-    name: 'Train Stations',
-    fill: '#c2a909'
-  }),
-  [MapSourceId.ExtOpenstreetmapHealthcareDoctor]: mapLayerProps({
-    type: 'point',
-    id: MapSourceId.ExtOpenstreetmapHealthcareDoctor,
-    name: 'Doctors',
-    fill: '#ef2323',
-    line: '#ef2323'
   }),
   [MapSourceId.ExtDatagovukListedBuildings]: mapLayerProps({
     type: 'point',
@@ -691,8 +616,6 @@ const mapSourcesBase: Record<MapSourceId, MapSourceFoundation> = {
     getColor: (feature: Feature) => {
       const voltage = feature.properties?.voltage as number | undefined
       const dno = feature.properties?.dno
-      const situation = feature.properties?.situation
-      console.log('Powerline properties:', { voltage, dno, situation })
       if (!voltage) {
         console.debug(`Missing voltage for powerline in DNO ${dno}`)
         return '#999999'
@@ -845,16 +768,6 @@ export const gridInfrastructureGroup: LegendGroup = {
     MapSourceId.IntIndependentOperators,
     MapSourceId.IntSubstations,
     MapSourceId.IntPowerlines
-  ]
-}
-
-export const amenityGroup: LegendGroup = {
-  name: 'Amenities',
-  keys: [
-    MapSourceId.ExtOpenstreetmapHealthcareDoctor,
-    MapSourceId.ExtDatagovukEducationalEstablishments,
-    MapSourceId.ExtOpenstreetmapPublicTransportBusStop,
-    MapSourceId.ExtOpenstreetmapPublicTransportTrainStation
   ]
 }
 

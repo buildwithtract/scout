@@ -101,7 +101,16 @@ WITH
             uuid,
             object_id as reference,
             n2k_site_name as name,
-            ST_AsMVTGeom (ip.geometry_3857, tile.envelope)::geometry AS geometry
+            ST_AsMVTGeom (
+                ST_Simplify (
+                    ip.geometry_3857,
+                    CASE
+                        WHEN $1 >= 12 THEN 0
+                        ELSE GREATEST(0.5, POWER(2, 20 - $1) / 4)
+                    END
+                ),
+                tile.envelope
+            )::geometry AS geometry
         FROM
             public.ext_naturalengland_nutrient_neutrality_catchments ip,
             tile

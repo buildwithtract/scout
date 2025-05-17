@@ -1,61 +1,16 @@
--- name: GetExtDatagovukBuiltUpAreas :many
+-- name: GetExtDatagovukBuiltUpAreaLatestImport :one
+SELECT
+    MAX(last_imported_at)
+FROM
+    ext_datagovuk_built_up_areas;
+
+-- name: GetExtDatagovukBuiltUpAreaForReference :one
 SELECT
     *
 FROM
-    public.ext_datagovuk_built_up_areas;
-
--- name: GetExtDatagovukBuiltUpAreaUuidsAndIntersectionsThatIntersectGeometry :many
-WITH
-    input_geom AS (
-        SELECT
-            ST_GeomFromGeoJSON (sqlc.arg ('geometry'))::geometry as geom
-    )
-SELECT
-    uuid,
-    ST_Intersection (u.geometry, i.geom)::geometry AS intersection
-FROM
-    public.ext_datagovuk_built_up_areas u,
-    input_geom i
+    public.ext_datagovuk_built_up_areas
 WHERE
-    ST_Intersects (u.geometry, i.geom);
-
--- name: GetExtDatagovukBuiltUpAreaUuidsAndZonesThatIntersectGeometry :many
-WITH
-    input_geom AS (
-        SELECT
-            ST_GeomFromGeoJSON (sqlc.arg ('geometry'))::geometry as geom
-    )
-SELECT
-    uuid,
-    name
-FROM
-    public.ext_datagovuk_built_up_areas u,
-    input_geom i
-WHERE
-    ST_Intersects (u.geometry, i.geom);
-
--- name: GetExtDatagovukBuiltUpAreasNearGeometry :many
-WITH
-    input_geom AS (
-        SELECT
-            ST_GeomFromGeoJSON (sqlc.arg ('geometry'))::geometry as geom
-    )
-SELECT
-    u.*,
-    ST_Distance (u.geometry::geography, i.geom::geography)::float AS distance
-FROM
-    public.ext_datagovuk_built_up_areas u,
-    input_geom i
-WHERE
-    ST_DWithin (
-        u.geometry::geography,
-        i.geom::geography,
-        sqlc.arg ('distance')
-    )
-ORDER BY
-    distance ASC
-LIMIT
-    $1;
+    reference = $1;
 
 -- name: GetExtDatagovukBuiltUpAreasInMvt :one
 WITH
@@ -72,7 +27,16 @@ WITH
             uuid,
             name,
             COALESCE('Built Up Area: ' || name) AS annotation,
-            ST_AsMVTGeom (ip.geometry_3857, tile.envelope)::geometry AS geometry
+            ST_AsMVTGeom (
+                ST_Simplify (
+                    ip.geometry_3857,
+                    CASE
+                        WHEN sqlc.arg (z) >= 12 THEN 0
+                        ELSE GREATEST(0.5, POWER(2, 20 - sqlc.arg (z)) / 4)
+                    END
+                ),
+                tile.envelope
+            )::geometry AS geometry
         FROM
             public.ext_datagovuk_built_up_areas ip,
             tile
@@ -83,22 +47,6 @@ SELECT
     ST_AsMVT (mvtgeom.*)::bytea AS mvt
 FROM
     mvtgeom;
-
--- name: GetExtDatagovukBuiltUpArea :one
-SELECT
-    *
-FROM
-    public.ext_datagovuk_built_up_areas
-WHERE
-    uuid = $1;
-
--- name: GetExtDatagovukBuiltUpAreaForReference :one
-SELECT
-    *
-FROM
-    public.ext_datagovuk_built_up_areas
-WHERE
-    reference = $1;
 
 -- name: NewExtDatagovukBuiltUpAreaFromWGS84 :one
 INSERT INTO
@@ -112,25 +60,6 @@ VALUES
 RETURNING
     *;
 
--- name: GetExtDatagovukBuiltUpAreaThatIntersectsGeometry :one
-SELECT
-    *
-FROM
-    public.ext_datagovuk_built_up_areas
-WHERE
-    ST_Intersects (geometry_3857, ST_GeomFromGeoJSON ($1)::geometry);
-
--- name: DeleteAllExtDatagovukBuiltUpAreas :exec
-DELETE FROM public.ext_datagovuk_built_up_areas
-WHERE
-    TRUE;
-
--- name: GetExtDatagovukBuiltUpAreaLatestImport :one
-SELECT
-    MAX(last_imported_at)
-FROM
-    ext_datagovuk_built_up_areas;
-
 -- name: PartialUpdateExtDatagovukBuiltUpAreaForReference :exec
 UPDATE public.ext_datagovuk_built_up_areas
 SET
@@ -142,3 +71,8 @@ SET
     last_imported_at = NOW()
 WHERE
     reference = sqlc.arg ('reference');
+
+-- name: DeleteAllExtDatagovukBuiltUpAreas :exec
+DELETE FROM public.ext_datagovuk_built_up_areas
+WHERE
+    TRUE;

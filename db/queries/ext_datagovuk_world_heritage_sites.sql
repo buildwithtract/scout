@@ -26,7 +26,16 @@ WITH
         SELECT
             uuid,
             name,
-            ST_AsMVTGeom (ip.geometry_3857, tile.envelope)::geometry AS geometry
+            ST_AsMVTGeom (
+                ST_Simplify (
+                    ip.geometry_3857,
+                    CASE
+                        WHEN sqlc.arg (z) >= 12 THEN 0
+                        ELSE GREATEST(0.5, POWER(2, 20 - sqlc.arg (z)) / 4)
+                    END
+                ),
+                tile.envelope
+            )::geometry AS geometry
         FROM
             public.ext_datagovuk_world_heritage_sites ip,
             tile

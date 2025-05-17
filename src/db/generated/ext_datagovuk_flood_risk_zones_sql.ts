@@ -129,7 +129,16 @@ WITH
         SELECT
             uuid,
             zone,
-            ST_AsMVTGeom (ip.geometry_3857, tile.envelope)::geometry AS geometry
+            ST_AsMVTGeom (
+                ST_Simplify (
+                    ip.geometry_3857,
+                    CASE
+                        WHEN $1 >= 12 THEN 0
+                        ELSE GREATEST(0.5, POWER(2, 20 - $1) / 4)
+                    END
+                ),
+                tile.envelope
+            )::geometry AS geometry
         FROM
             public.ext_datagovuk_flood_risk_zones ip,
             tile

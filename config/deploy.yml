@@ -7,7 +7,7 @@ servers:
 
 proxy:
   ssl: true
-  host: scout-dev.buildwithtract.com
+  host: scout.buildwithtract.com
 
 registry:
   server: ghcr.io

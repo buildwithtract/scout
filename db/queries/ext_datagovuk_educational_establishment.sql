@@ -1,16 +1,8 @@
--- name: GetExtDatagovukEducationalEstablishments :many
+-- name: GetExtDatagovukEducationalEstablishmentLatestImport :one
 SELECT
-    *
+    MAX(last_imported_at)
 FROM
     public.ext_datagovuk_educational_establishment;
-
--- name: GetExtDatagovukEducationalEstablishment :one
-SELECT
-    *
-FROM
-    public.ext_datagovuk_educational_establishment
-WHERE
-    uuid = sqlc.arg (uuid);
 
 -- name: GetExtDatagovukEducationalEstablishmentForReference :one
 SELECT
@@ -20,22 +12,40 @@ FROM
 WHERE
     reference = sqlc.arg (reference);
 
--- name: GetExtDatagovukEducationalEstablishmentThatIntersectsGeometry :one
+-- name: GetExtDatagovukEducationalEstablishmentsInMvt :one
+WITH
+    tile AS (
+        SELECT
+            ST_TileEnvelope (
+                sqlc.arg (z)::int,
+                sqlc.arg (x)::int,
+                sqlc.arg (y)::int
+            ) as envelope
+    ),
+    mvtgeom AS (
+        SELECT
+            uuid,
+            name || ' (Capacity: ' || capacity || ')' AS annotation,
+            ST_AsMVTGeom (
+                ST_Simplify (
+                    ip.geometry_3857,
+                    CASE
+                        WHEN sqlc.arg (z) >= 12 THEN 0
+                        ELSE GREATEST(0.5, POWER(2, 20 - sqlc.arg (z)) / 4)
+                    END
+                ),
+                tile.envelope
+            )::geometry AS geometry
+        FROM
+            public.ext_datagovuk_educational_establishment ip,
+            tile
+        WHERE
+            ST_Intersects (ip.geometry_3857, tile.envelope)
+    )
 SELECT
-    *
+    ST_AsMVT (mvtgeom.*)::bytea AS mvt
 FROM
-    public.ext_datagovuk_educational_establishment
-WHERE
-    ST_Intersects (
-        geometry,
-        ST_GeomFromGeoJSON (sqlc.arg (geometry))::geometry
-    );
-
--- name: GetExtDatagovukEducationalEstablishmentLatestImport :one
-SELECT
-    MAX(last_imported_at)
-FROM
-    public.ext_datagovuk_educational_establishment;
+    mvtgeom;
 
 -- name: NewExtDatagovukEducationalEstablishmentFromWGS84 :exec
 INSERT INTO
@@ -94,45 +104,3 @@ WHERE
 DELETE FROM public.ext_datagovuk_educational_establishment
 WHERE
     TRUE;
-
--- name: GetExtDatagovukEducationalEstablishmentsInMvt :one
-WITH
-    tile AS (
-        SELECT
-            ST_TileEnvelope (
-                sqlc.arg (z)::int,
-                sqlc.arg (x)::int,
-                sqlc.arg (y)::int
-            ) as envelope
-    ),
-    mvtgeom AS (
-        SELECT
-            uuid,
-            name || ' (Capacity: ' || capacity || ')' AS annotation,
-            ST_AsMVTGeom (ip.geometry_3857, tile.envelope)::geometry AS geometry
-        FROM
-            public.ext_datagovuk_educational_establishment ip,
-            tile
-        WHERE
-            ST_Intersects (ip.geometry_3857, tile.envelope)
-    )
-SELECT
-    ST_AsMVT (mvtgeom.*)::bytea AS mvt
-FROM
-    mvtgeom;
-
--- name: GetNearestExtDatagovukEducationalEstablishments :many
-SELECT
-    *,
-    ST_Distance (
-        geometry::geography,
-        ST_GeomFromGeoJSON (sqlc.arg (geometry))::geography
-    )::float AS distance
-FROM
-    public.ext_datagovuk_educational_establishment
-WHERE
-    status = '1'
-ORDER BY
-    distance ASC
-LIMIT
-    sqlc.arg (num_results);

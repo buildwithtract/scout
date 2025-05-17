@@ -1,17 +1,3 @@
--- name: GetExtDatagovukBattlefields :many
-SELECT
-    *
-FROM
-    public.ext_datagovuk_battlefields;
-
--- name: GetExtDatagovukBattlefield :one
-SELECT
-    *
-FROM
-    public.ext_datagovuk_battlefields
-WHERE
-    uuid = sqlc.arg (uuid);
-
 -- name: GetExtDatagovukBattlefieldForReference :one
 SELECT
     *
@@ -20,39 +6,46 @@ FROM
 WHERE
     reference = sqlc.arg (reference);
 
--- name: GetExtDatagovukBattlefieldThatIntersectsGeometry :one
-SELECT
-    *
-FROM
-    public.ext_datagovuk_battlefields
-WHERE
-    ST_Intersects (
-        geometry_3857,
-        ST_GeomFromGeoJSON (sqlc.arg (geometry))::geometry
-    );
-
--- name: GetExtDatagovukBattlefieldsWithin1KmOfGeometry :many
-SELECT
-    *
-FROM
-    public.ext_datagovuk_battlefields
-WHERE
-    geometry_3857 && ST_Expand (ST_GeomFromGeoJSON ($1)::geometry, 1000)
-    AND ST_DWithin (
-        geometry_3857,
-        ST_GeomFromGeoJSON (sqlc.arg (geometry))::geometry,
-        1000
-    )
-    AND NOT ST_Intersects (
-        geometry_3857,
-        ST_GeomFromGeoJSON (sqlc.arg (geometry))::geometry
-    );
-
 -- name: GetExtDatagovukBattlefieldLatestImport :one
 SELECT
     MAX(last_imported_at)
 FROM
     ext_datagovuk_battlefields;
+
+-- name: GetExtDatagovukBattlefieldsInMvt :one
+WITH
+    tile AS (
+        SELECT
+            ST_TileEnvelope (
+                sqlc.arg (z)::int,
+                sqlc.arg (x)::int,
+                sqlc.arg (y)::int
+            ) as envelope
+    ),
+    mvtgeom AS (
+        SELECT
+            uuid,
+            name,
+            ST_AsMVTGeom (
+                ST_Simplify (
+                    ip.geometry_3857,
+                    CASE
+                        WHEN sqlc.arg (z) >= 12 THEN 0
+                        ELSE GREATEST(0.5, POWER(2, 20 - sqlc.arg (z)) / 4)
+                    END
+                ),
+                tile.envelope
+            )::geometry AS geometry
+        FROM
+            public.ext_datagovuk_battlefields ip,
+            tile
+        WHERE
+            ST_Intersects (ip.geometry_3857, tile.envelope)
+    )
+SELECT
+    ST_AsMVT (mvtgeom.*)::bytea AS mvt
+FROM
+    mvtgeom;
 
 -- name: NewExtDatagovukBattlefieldFromWGS84 :exec
 INSERT INTO
@@ -109,40 +102,3 @@ WHERE
 DELETE FROM public.ext_datagovuk_battlefields
 WHERE
     TRUE;
-
--- name: GetExtDatagovukBattlefieldsInMvt :one
-WITH
-    tile AS (
-        SELECT
-            ST_TileEnvelope (
-                sqlc.arg (z)::int,
-                sqlc.arg (x)::int,
-                sqlc.arg (y)::int
-            ) as envelope
-    ),
-    mvtgeom AS (
-        SELECT
-            uuid,
-            name,
-            ST_AsMVTGeom (ip.geometry_3857, tile.envelope)::geometry AS geometry
-        FROM
-            public.ext_datagovuk_battlefields ip,
-            tile
-        WHERE
-            ST_Intersects (ip.geometry_3857, tile.envelope)
-    )
-SELECT
-    ST_AsMVT (mvtgeom.*)::bytea AS mvt
-FROM
-    mvtgeom;
-
--- name: GetExtDatagovukBattlefieldIntersectingGeometry :many
-SELECT
-    *
-FROM
-    public.ext_datagovuk_battlefields
-WHERE
-    ST_Intersects (
-        geometry,
-        ST_GeomFromGeoJSON (sqlc.arg (geometry))::geometry
-    );

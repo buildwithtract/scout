@@ -14,7 +14,6 @@ export enum Dataset {
   ExtDatagovukSSSIs = 'ext-datagovuk-sssis',
   ExtDatagovukFloodZone = 'ext_datagovuk_flood_risk_zones',
   ExtDatagovukGreenBelt = 'ext-datagovuk-green-belt',
-  ExtOsContours = 'ext-os-contours',
   ExtDatagovukSpecialProtectionArea = 'ext-datagovuk-special-protection-area',
   ExtDatagovukRamsar = 'ext-datagovuk-ramsar',
   ExtDatagovukHeritageAtRisk = 'ext-datagovuk-heritage-at-risk',
@@ -32,14 +31,8 @@ export enum Dataset {
   ExtNaturalenglandNutrientNeutrality = 'ext-naturalengland-nutrient-neutrality-catchments',
   ExtEnvironmentagencyAlcGrades = 'ext-environmentagency-alc-grades',
   ExtEnvironmentagencyProvisionalAlcGrades = 'ext-environmentagency-provisional-alc-grades',
-  ExtOpenstreetmapBusStop = 'ext-openstreetmap-public-transport-bus-stop',
-  ExtOpenstreetmapTrainStation = 'ext-openstreetmap-public-transport-train-station',
-  ExtOpenstreetmapDoctor = 'ext-openstreetmap-healthcare-doctor',
   ExtDatagovukListedBuildings = 'ext-datagovuk-listed-buildings',
   ExtDatagovukBrownfieldLand = 'ext-datagovuk-brownfield-land',
-  ExtOpenstreetmapPublicRightOfWayFootpath = 'ext-openstreetmap-public-right-of-way-footpath',
-  ExtOpenstreetmapPublicRightOfWayBridleway = 'ext-openstreetmap-public-right-of-way-bridleway',
-  ExtOpenstreetmapPublicRightOfWayByway = 'ext-openstreetmap-public-right-of-way-byway',
   ExtNpgDnos = 'ext-npg-dnos',
   ExtPlanningApplications = 'ext-planning-applications',
   IntIndependentOperators = 'int-independent-operators',
@@ -267,60 +260,6 @@ export function getDataset(client: Client, key: Dataset, params: TileParams) {
           y: y as number
         }
       )
-
-    case Dataset.ExtOpenstreetmapBusStop:
-      return dbQueries.getNearestExtOpenstreetmapPublicTransportInMvtByType(
-        client,
-        {
-          z: z as number,
-          x: x as number,
-          y: y as number,
-          nodeType: 'bus_stop'
-        }
-      )
-
-    case Dataset.ExtOpenstreetmapTrainStation:
-      return dbQueries.getNearestExtOpenstreetmapPublicTransportInMvtByType(
-        client,
-        {
-          z: z as number,
-          x: x as number,
-          y: y as number,
-          nodeType: 'train_station'
-        }
-      )
-
-    case Dataset.ExtOpenstreetmapPublicRightOfWayFootpath:
-      return dbQueries.getOpenstreetmapPublicRightsOfWayInMvtByType(client, {
-        z: z as number,
-        x: x as number,
-        y: y as number,
-        wayType: 'footpath'
-      })
-
-    case Dataset.ExtOpenstreetmapPublicRightOfWayBridleway:
-      return dbQueries.getOpenstreetmapPublicRightsOfWayInMvtByType(client, {
-        z: z as number,
-        x: x as number,
-        y: y as number,
-        wayType: 'bridleway'
-      })
-
-    case Dataset.ExtOpenstreetmapPublicRightOfWayByway:
-      return dbQueries.getOpenstreetmapPublicRightsOfWayInMvtByType(client, {
-        z: z as number,
-        x: x as number,
-        y: y as number,
-        wayType: 'byway'
-      })
-
-    case Dataset.ExtOpenstreetmapDoctor:
-      return dbQueries.getExtOpenstreetmapHealthcareInMvtByType(client, {
-        z: z as number,
-        x: x as number,
-        y: y as number,
-        nodeType: 'doctor'
-      })
 
     case Dataset.ExtNpgDnos:
       return dbQueries.getExtNpgDnosInMvt(client, {

@@ -340,62 +340,6 @@ export async function deleteAllExtDatagovukGreenBelt(client: Client): Promise<vo
     });
 }
 
-export const getExtDatagovukGreenBeltIntersectingGeometryQuery = `-- name: GetExtDatagovukGreenBeltIntersectingGeometry :many
-SELECT
-    uuid, reference, name, entry_date, start_date, end_date, entity, green_belt_core, geometry, geometry_3857, geometry_27700, first_imported_at, last_imported_at
-FROM
-    public.ext_datagovuk_green_belt
-WHERE
-    ST_Intersects (
-        geometry,
-        ST_GeomFromGeoJSON ($1)::geometry
-    )`;
-
-export interface GetExtDatagovukGreenBeltIntersectingGeometryArgs {
-    geometry: string;
-}
-
-export interface GetExtDatagovukGreenBeltIntersectingGeometryRow {
-    uuid: string;
-    reference: string;
-    name: string;
-    entryDate: Date;
-    startDate: Date | null;
-    endDate: Date | null;
-    entity: string;
-    greenBeltCore: string;
-    geometry: string;
-    geometry_3857: string;
-    geometry_27700: string;
-    firstImportedAt: Date;
-    lastImportedAt: Date;
-}
-
-export async function getExtDatagovukGreenBeltIntersectingGeometry(client: Client, args: GetExtDatagovukGreenBeltIntersectingGeometryArgs): Promise<GetExtDatagovukGreenBeltIntersectingGeometryRow[]> {
-    const result = await client.query({
-        text: getExtDatagovukGreenBeltIntersectingGeometryQuery,
-        values: [args.geometry],
-        rowMode: "array"
-    });
-    return result.rows.map(row => {
-        return {
-            uuid: row[0],
-            reference: row[1],
-            name: row[2],
-            entryDate: row[3],
-            startDate: row[4],
-            endDate: row[5],
-            entity: row[6],
-            greenBeltCore: row[7],
-            geometry: row[8],
-            geometry_3857: row[9],
-            geometry_27700: row[10],
-            firstImportedAt: row[11],
-            lastImportedAt: row[12]
-        };
-    });
-}
-
 export const getExtDatagovukGreenBeltInMvtQuery = `-- name: GetExtDatagovukGreenBeltInMvt :one
 WITH
     tile AS (
@@ -411,7 +355,16 @@ WITH
             uuid,
             name,
             COALESCE('Greenbelt: ' || name) AS annotation,
-            ST_AsMVTGeom (ip.geometry_3857, tile.envelope)::geometry AS geometry
+            ST_AsMVTGeom (
+                ST_Simplify (
+                    ip.geometry_3857,
+                    CASE
+                        WHEN $1 >= 12 THEN 0
+                        ELSE GREATEST(0.5, POWER(2, 20 - $1) / 4)
+                    END
+                ),
+                tile.envelope
+            )::geometry AS geometry
         FROM
             public.ext_datagovuk_green_belt ip,
             tile
