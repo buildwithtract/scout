@@ -1,3 +1,4 @@
+import { insertFetch, updateFetch } from '@/db'
 import { getDbClient } from '@/db/singleton-client'
 import { ExtDatagovukAncientWoodland } from '@/fetchers/ext_datagovuk_ancient_woodland'
 import { ExtDatagovukAonb } from '@/fetchers/ext_datagovuk_aonb'
@@ -162,6 +163,29 @@ export const fetchDataset = async (fetcherName: string) => {
   await fetcher.fetchIfRequired()
 }
 
+const recordStartFetcherRun = async (
+  db: typeof dbClient,
+  fetcherNames: string[]
+) => {
+  const { uuid } = await insertFetch(db, {
+    name: fetcherNames.join(','),
+    command: process.argv.join(' ')
+  })
+  return uuid
+}
+
+const recordEndFetcherRun = async (
+  db: typeof dbClient,
+  uuid: string,
+  error: string | null = null
+) => {
+  await updateFetch(db, {
+    uuid,
+    finishedAt: new Date(),
+    error
+  })
+}
+
 const main = async () => {
   const args = process.argv.slice(2)
   if (args.length === 0) {
@@ -177,7 +201,25 @@ const main = async () => {
   console.info(chalk.green('Running fetchers:'), fetcherNames)
 
   for (const fetcherName of fetcherNames) {
-    await fetchDataset(fetcherName)
+    const uuid = await recordStartFetcherRun(dbClient, fetcherNames)
+
+    let error: string | null = null
+
+    try {
+      await fetchDataset(fetcherName)
+    } catch (e) {
+      error =
+        e instanceof Error
+          ? JSON.stringify({
+              name: e.name,
+              message: e.message,
+              stack: e.stack,
+              cause: e.cause
+            })
+          : String(e)
+    } finally {
+      await recordEndFetcherRun(dbClient, uuid, error)
+    }
   }
 
   console.info(chalk.green('Done!'))
