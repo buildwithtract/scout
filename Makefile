@@ -20,6 +20,9 @@ stop: stop-docker
 sqlc:
 	sqlc generate --file db/sqlc.yaml
 
+migrate-create:
+	goose -dir db/migrations create $(name) sql
+
 migrate-up:
 	echo "Migrating up $(DATABASE_URL)"
 	goose -dir db/migrations postgres $(DATABASE_URL) up

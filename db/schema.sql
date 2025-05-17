@@ -352,12 +352,14 @@ CREATE TABLE public.ext_datagovuk_educational_establishment (
 
 CREATE TABLE public.ext_datagovuk_flood_risk_zones (
     uuid uuid DEFAULT public.uuid_generate_v4() NOT NULL,
-    geometry public.geometry NOT NULL,
+    reference text NOT NULL,
     type text NOT NULL,
     zone text NOT NULL,
+    geometry public.geometry NOT NULL,
+    geometry_3857 public.geometry NOT NULL,
+    geometry_27700 public.geometry NOT NULL,
     first_imported_at timestamp without time zone DEFAULT now() NOT NULL,
-    last_imported_at timestamp without time zone DEFAULT now() NOT NULL,
-    reference character varying(255) NOT NULL
+    last_imported_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
 
@@ -2036,10 +2038,52 @@ CREATE UNIQUE INDEX ext_datagovuk_built_up_areas_uuid_idx ON public.ext_datagovu
 
 
 --
--- Name: ext_datagovuk_flood_risk_zones_zone; Type: INDEX; Schema: public; Owner: -
+-- Name: ext_datagovuk_flood_risk_zones_geometry_27700_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX ext_datagovuk_flood_risk_zones_zone ON public.ext_datagovuk_flood_risk_zones USING btree (zone);
+CREATE INDEX ext_datagovuk_flood_risk_zones_geometry_27700_idx ON public.ext_datagovuk_flood_risk_zones USING gist (geometry_27700);
+
+
+--
+-- Name: ext_datagovuk_flood_risk_zones_geometry_3857_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ext_datagovuk_flood_risk_zones_geometry_3857_idx ON public.ext_datagovuk_flood_risk_zones USING gist (geometry_3857);
+
+
+--
+-- Name: ext_datagovuk_flood_risk_zones_geometry_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ext_datagovuk_flood_risk_zones_geometry_idx ON public.ext_datagovuk_flood_risk_zones USING gist (geometry);
+
+
+--
+-- Name: ext_datagovuk_flood_risk_zones_reference_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ext_datagovuk_flood_risk_zones_reference_idx ON public.ext_datagovuk_flood_risk_zones USING btree (reference);
+
+
+--
+-- Name: ext_datagovuk_flood_risk_zones_type_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ext_datagovuk_flood_risk_zones_type_idx ON public.ext_datagovuk_flood_risk_zones USING btree (type);
+
+
+--
+-- Name: ext_datagovuk_flood_risk_zones_uuid_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX ext_datagovuk_flood_risk_zones_uuid_idx ON public.ext_datagovuk_flood_risk_zones USING btree (uuid);
+
+
+--
+-- Name: ext_datagovuk_flood_risk_zones_zone_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ext_datagovuk_flood_risk_zones_zone_idx ON public.ext_datagovuk_flood_risk_zones USING btree (zone);
 
 
 --
@@ -3371,8 +3415,9 @@ SET row_security = off;
 -- Data for Name: goose_db_version; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.goose_db_version (version_id, is_applied) VALUES (0, true);
-INSERT INTO public.goose_db_version (version_id, is_applied) VALUES (20250423092753, true);
+INSERT INTO public.goose_db_version ("version_id", "is_applied") VALUES (0, true);
+INSERT INTO public.goose_db_version ("version_id", "is_applied") VALUES (20250423092753, true);
+INSERT INTO public.goose_db_version ("version_id", "is_applied") VALUES (20250517123430, true);
 
 
 --
