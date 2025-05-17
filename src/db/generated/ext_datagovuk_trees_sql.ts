@@ -378,12 +378,12 @@ WITH
         SELECT
             uuid,
             'TPO: ' || reference as annotation,
-            ST_AsMVTGeom (ST_Transform (ip.geometry, 3857), tile.envelope)::geometry AS geometry
+            ST_AsMVTGeom (ip.geometry_3857, tile.envelope)::geometry AS geometry
         FROM
             public.ext_datagovuk_trees ip,
             tile
         WHERE
-            ST_Intersects (ip.geometry, ST_Transform (tile.envelope, 4326))
+            ST_Intersects (ip.geometry_3857, tile.envelope)
     )
 SELECT
     ST_AsMVT (mvtgeom.*)::bytea AS mvt
@@ -413,57 +413,5 @@ export async function getExtDatagovukTreesInMvt(client: Client, args: GetExtData
     return {
         mvt: row[0]
     };
-}
-
-export const getExtDatagovukTreesIntersectingGeometryQuery = `-- name: GetExtDatagovukTreesIntersectingGeometry :many
-SELECT
-    uuid, reference, species, name, notes, entry_date, geometry, geometry_3857, geometry_27700, first_imported_at, last_imported_at
-FROM
-    public.ext_datagovuk_trees
-WHERE
-    ST_Intersects (
-        geometry,
-        ST_GeomFromGeoJSON ($1)::geometry
-    )`;
-
-export interface GetExtDatagovukTreesIntersectingGeometryArgs {
-    geometry: string;
-}
-
-export interface GetExtDatagovukTreesIntersectingGeometryRow {
-    uuid: string;
-    reference: string;
-    species: string | null;
-    name: string | null;
-    notes: string | null;
-    entryDate: Date | null;
-    geometry: string;
-    geometry_3857: string;
-    geometry_27700: string;
-    firstImportedAt: Date;
-    lastImportedAt: Date;
-}
-
-export async function getExtDatagovukTreesIntersectingGeometry(client: Client, args: GetExtDatagovukTreesIntersectingGeometryArgs): Promise<GetExtDatagovukTreesIntersectingGeometryRow[]> {
-    const result = await client.query({
-        text: getExtDatagovukTreesIntersectingGeometryQuery,
-        values: [args.geometry],
-        rowMode: "array"
-    });
-    return result.rows.map(row => {
-        return {
-            uuid: row[0],
-            reference: row[1],
-            species: row[2],
-            name: row[3],
-            notes: row[4],
-            entryDate: row[5],
-            geometry: row[6],
-            geometry_3857: row[7],
-            geometry_27700: row[8],
-            firstImportedAt: row[9],
-            lastImportedAt: row[10]
-        };
-    });
 }
 

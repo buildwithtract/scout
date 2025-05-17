@@ -117,14 +117,3 @@ SELECT
     ST_AsMVT (mvtgeom.*)::bytea AS mvt
 FROM
     mvtgeom;
-
--- name: GetExtDatagovukSSSIIntersectingGeometry :many
-SELECT
-    *
-FROM
-    public.ext_datagovuk_sssi
-WHERE
-    ST_Intersects (
-        geometry,
-        ST_GeomFromGeoJSON (sqlc.arg (geometry))::geometry
-    );

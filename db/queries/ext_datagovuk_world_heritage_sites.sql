@@ -1,17 +1,3 @@
--- name: GetExtDatagovukWorldHeritageSites :many
-SELECT
-    *
-FROM
-    public.ext_datagovuk_world_heritage_sites;
-
--- name: GetExtDatagovukWorldHeritageSite :one
-SELECT
-    *
-FROM
-    public.ext_datagovuk_world_heritage_sites
-WHERE
-    uuid = sqlc.arg (uuid);
-
 -- name: GetExtDatagovukWorldHeritageSiteForReference :one
 SELECT
     *
@@ -20,33 +6,11 @@ FROM
 WHERE
     reference = sqlc.arg (reference);
 
--- name: GetExtDatagovukWorldHeritageSiteThatIntersectsGeometry :one
-SELECT
-    *
-FROM
-    public.ext_datagovuk_world_heritage_sites
-WHERE
-    ST_Intersects (
-        geometry_3857,
-        ST_GeomFromGeoJSON (sqlc.arg (geometry))::geometry
-    );
-
 -- name: GetExtDatagovukWorldHeritageSiteLatestImport :one
 SELECT
     MAX(last_imported_at)
 FROM
     public.ext_datagovuk_world_heritage_sites;
-
--- name: GetExtDatagovukWorldHeritageSiteIntersectingGeometry :many
-SELECT
-    *
-FROM
-    public.ext_datagovuk_world_heritage_sites
-WHERE
-    ST_Intersects (
-        geometry,
-        ST_GeomFromGeoJSON (sqlc.arg (geometry))::geometry
-    );
 
 -- name: GetExtDatagovukWorldHeritageSitesInMvt :one
 WITH

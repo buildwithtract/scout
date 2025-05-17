@@ -72,12 +72,12 @@ WITH
             uuid,
             name,
             COALESCE('Built Up Area: ' || name) AS annotation,
-            ST_AsMVTGeom (ST_Transform (ip.geometry, 3857), tile.envelope)::geometry AS geometry
+            ST_AsMVTGeom (ip.geometry_3857, tile.envelope)::geometry AS geometry
         FROM
             public.ext_datagovuk_built_up_areas ip,
             tile
         WHERE
-            ST_Intersects (ip.geometry, ST_Transform (tile.envelope, 4326))
+            ST_Intersects (ip.geometry_3857, tile.envelope)
     )
 SELECT
     ST_AsMVT (mvtgeom.*)::bytea AS mvt

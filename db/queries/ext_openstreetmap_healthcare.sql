@@ -1,17 +1,3 @@
--- name: GetExtOpenstreetmapHealthcare :many
-SELECT
-    *
-FROM
-    public.ext_openstreetmap_healthcare;
-
--- name: GetExtOpenstreetmapHealthcareNode :one
-SELECT
-    *
-FROM
-    public.ext_openstreetmap_healthcare
-WHERE
-    uuid = sqlc.arg (uuid);
-
 -- name: GetExtOpenstreetmapHealthcareForReference :one
 SELECT
     *
@@ -25,6 +11,33 @@ SELECT
     MAX(last_imported_at)
 FROM
     public.ext_openstreetmap_healthcare;
+
+-- name: GetExtOpenstreetmapHealthcareInMvtByType :one
+WITH
+    tile AS (
+        SELECT
+            ST_TileEnvelope (
+                sqlc.arg (z)::int,
+                sqlc.arg (x)::int,
+                sqlc.arg (y)::int
+            ) as envelope
+    ),
+    mvtgeom AS (
+        SELECT
+            uuid,
+            COALESCE(NULLIF(name, ''), 'Doctors') AS annotation,
+            ST_AsMVTGeom (ip.geometry_3857, tile.envelope)::geometry AS geometry
+        FROM
+            public.ext_openstreetmap_healthcare ip,
+            tile
+        WHERE
+            ST_Intersects (ip.geometry_3857, tile.envelope)
+            AND node_type = sqlc.arg (node_type)
+    )
+SELECT
+    ST_AsMVT (mvtgeom.*)::bytea AS mvt
+FROM
+    mvtgeom;
 
 -- name: NewOpenstreetmapHealthcare :exec
 INSERT INTO
@@ -54,46 +67,3 @@ WHERE
 DELETE FROM public.ext_openstreetmap_healthcare
 WHERE
     TRUE;
-
--- name: GetNearestExtOpenstreetmapHealthcareByType :many
-SELECT
-    *,
-    ST_Distance (
-        geometry::geography,
-        ST_GeomFromWKB (sqlc.arg (geometry), 4326)::geography
-    )::float AS distance
-FROM
-    public.ext_openstreetmap_healthcare
-WHERE
-    node_type = sqlc.arg (node_type)
-ORDER BY
-    distance ASC
-LIMIT
-    sqlc.arg (num_results);
-
--- name: GetExtOpenstreetmapHealthcareInMvtByType :one
-WITH
-    tile AS (
-        SELECT
-            ST_TileEnvelope (
-                sqlc.arg (z)::int,
-                sqlc.arg (x)::int,
-                sqlc.arg (y)::int
-            ) as envelope
-    ),
-    mvtgeom AS (
-        SELECT
-            uuid,
-            COALESCE(NULLIF(name, ''), 'Doctors') AS annotation,
-            ST_AsMVTGeom (ST_Transform (ip.geometry, 3857), tile.envelope)::geometry AS geometry
-        FROM
-            public.ext_openstreetmap_healthcare ip,
-            tile
-        WHERE
-            ST_Intersects (ip.geometry, ST_Transform (tile.envelope, 4326))
-            AND node_type = sqlc.arg (node_type)
-    )
-SELECT
-    ST_AsMVT (mvtgeom.*)::bytea AS mvt
-FROM
-    mvtgeom;

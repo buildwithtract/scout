@@ -115,12 +115,12 @@ WITH
                     WHEN node_type = 'train_station' THEN 'Train Station'
                 END
             ) AS annotation,
-            ST_AsMVTGeom (ST_Transform (ip.geometry, 3857), tile.envelope)::geometry AS geometry
+            ST_AsMVTGeom (ip.geometry_3857, tile.envelope)::geometry AS geometry
         FROM
             public.ext_openstreetmap_public_transport ip,
             tile
         WHERE
-            ST_Intersects (ip.geometry, ST_Transform (tile.envelope, 4326))
+            ST_Intersects (ip.geometry_3857, tile.envelope)
             AND node_type = $4
     )
 SELECT

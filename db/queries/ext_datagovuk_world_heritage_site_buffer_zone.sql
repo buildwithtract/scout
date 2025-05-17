@@ -1,17 +1,3 @@
--- name: GetExtDatagovukWorldHeritageSiteBufferZones :many
-SELECT
-    *
-FROM
-    public.ext_datagovuk_world_heritage_site_buffer_zones;
-
--- name: GetExtDatagovukWorldHeritageSiteBufferZone :one
-SELECT
-    *
-FROM
-    public.ext_datagovuk_world_heritage_site_buffer_zones
-WHERE
-    uuid = sqlc.arg (uuid);
-
 -- name: GetExtDatagovukWorldHeritageSiteBufferZoneForReference :one
 SELECT
     *
@@ -19,34 +5,6 @@ FROM
     public.ext_datagovuk_world_heritage_site_buffer_zones
 WHERE
     reference = sqlc.arg (reference);
-
--- name: GetExtDatagovukWorldHeritageSiteBufferZoneThatIntersectsGeometry :one
-SELECT
-    *
-FROM
-    public.ext_datagovuk_world_heritage_site_buffer_zones
-WHERE
-    ST_Intersects (
-        geometry_3857,
-        ST_GeomFromGeoJSON (sqlc.arg (geometry))::geometry
-    );
-
--- name: GetExtDatagovukWorldHeritageSiteBufferZoneWithin1KmOfGeometry :many
-SELECT
-    *
-FROM
-    public.ext_datagovuk_world_heritage_site_buffer_zones
-WHERE
-    geometry_3857 && ST_Expand (ST_GeomFromGeoJSON ($1)::geometry, 1000)
-    AND ST_DWithin (
-        geometry_3857,
-        ST_GeomFromGeoJSON ($1)::geometry,
-        1000
-    )
-    AND NOT ST_Intersects (
-        geometry_3857,
-        ST_GeomFromGeoJSON (sqlc.arg (geometry))::geometry
-    );
 
 -- name: GetExtDatagovukWorldHeritageSiteBufferZoneLatestImport :one
 SELECT
@@ -124,17 +82,3 @@ WHERE
 DELETE FROM public.ext_datagovuk_world_heritage_site_buffer_zones
 WHERE
     TRUE;
-
--- name: CountExtDatagovukWorldHeritageSiteBufferZonesWithin1KmOfGeometry :one
-SELECT
-    COUNT(*)
-FROM
-    public.ext_datagovuk_world_heritage_site_buffer_zones
-WHERE
-    geometry_3857 && ST_Expand (ST_GeomFromGeoJSON ($1)::geometry, 1000)
-    AND ST_DWithin (
-        geometry_3857,
-        ST_GeomFromGeoJSON ($1)::geometry,
-        1000
-    )
-    AND NOT ST_Intersects (geometry_3857, ST_GeomFromGeoJSON ($1)::geometry);

@@ -293,12 +293,12 @@ WITH
         SELECT
             uuid,
             name,
-            ST_AsMVTGeom (ST_Transform (ip.geometry, 3857), tile.envelope)::geometry AS geometry
+            ST_AsMVTGeom (ip.geometry_3857, tile.envelope)::geometry AS geometry
         FROM
             public.ext_datagovuk_national_parks ip,
             tile
         WHERE
-            ST_Intersects (ip.geometry, ST_Transform (tile.envelope, 4326))
+            ST_Intersects (ip.geometry_3857, tile.envelope)
     )
 SELECT
     ST_AsMVT (mvtgeom.*)::bytea AS mvt

@@ -84,12 +84,12 @@ WITH
         SELECT
             uuid,
             way_type,
-            ST_AsMVTGeom (ST_Transform (ip.geometry, 3857), tile.envelope)::geometry AS geometry
+            ST_AsMVTGeom (ip.geometry_3857, tile.envelope)::geometry AS geometry
         FROM
             public.ext_openstreetmap_public_right_of_way ip,
             tile
         WHERE
-            ST_Intersects (ip.geometry, ST_Transform (tile.envelope, 4326))
+            ST_Intersects (ip.geometry_3857, tile.envelope)
             AND way_type = sqlc.arg (way_type)
     )
 SELECT

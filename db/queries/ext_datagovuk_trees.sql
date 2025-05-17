@@ -106,25 +106,14 @@ WITH
         SELECT
             uuid,
             'TPO: ' || reference as annotation,
-            ST_AsMVTGeom (ST_Transform (ip.geometry, 3857), tile.envelope)::geometry AS geometry
+            ST_AsMVTGeom (ip.geometry_3857, tile.envelope)::geometry AS geometry
         FROM
             public.ext_datagovuk_trees ip,
             tile
         WHERE
-            ST_Intersects (ip.geometry, ST_Transform (tile.envelope, 4326))
+            ST_Intersects (ip.geometry_3857, tile.envelope)
     )
 SELECT
     ST_AsMVT (mvtgeom.*)::bytea AS mvt
 FROM
     mvtgeom;
-
--- name: GetExtDatagovukTreesIntersectingGeometry :many
-SELECT
-    *
-FROM
-    public.ext_datagovuk_trees
-WHERE
-    ST_Intersects (
-        geometry,
-        ST_GeomFromGeoJSON (sqlc.arg (geometry))::geometry
-    );
