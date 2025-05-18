@@ -31,7 +31,7 @@ RUN --mount=type=secret,id=NEXT_PUBLIC_GOOGLE_MAPS_API_KEY \
 
 FROM oven/bun:1.2.13 AS runner
 WORKDIR /app
-RUN apt-get update && apt-get install -y make gdal-bin
+RUN apt-get update && apt-get install -y gdal-bin make tmux
 COPY --from=builder /app /app
 ARG KAMAL_VERSION
 ENV NEXT_PUBLIC_GIT_SHA=$KAMAL_VERSION
