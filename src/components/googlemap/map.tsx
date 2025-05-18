@@ -5,6 +5,7 @@ import { load } from '@loaders.gl/core'
 import { Map } from '@vis.gl/react-google-maps'
 import {
   Color,
+  Deck,
   DeckGLProps,
   DeckProps,
   GeoJsonLayer,
@@ -214,7 +215,7 @@ export const GoogleMap = ({
           // Make sure layers are pickable for hover detection
           pickable: true,
           autoHighlight: true, // Enable auto-highlighting on hover
-          highlightColor: [255, 255, 255, 128], // Semi-transparent white highlight
+          highlightColor: [255, 255, 255, 12], // Semi-transparent white highlight
           getFillColor: colorAccessors[source.id].getFillColorAccessor(
             hoveredId,
             clickedId
@@ -499,12 +500,13 @@ export const GoogleMap = ({
                 }
 
                 // 2. If deck is available, try pickObjects to find *additional* layers
-                if (info.deck) {
-                  const pickedObjects = info.deck.pickObjects({
+                if ((window as any).__deckRef) {
+                  const pickedObjects = (
+                    (window as any).__deckRef as Deck
+                  ).pickMultipleObjects({
                     x: info.x,
                     y: info.y,
-                    width: 5, // Keep 5x5 picking radius
-                    height: 5,
+                    radius: 5, // Keep 5x5 picking radius
                     layerIds: sources.map((s) => s.id)
                   })
 
