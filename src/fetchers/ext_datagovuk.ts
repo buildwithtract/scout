@@ -81,8 +81,9 @@ export abstract class DatagovukFetcher<
     let total = 0
     let totalInserted = 0
     let totalUpdated = 0
-    for await (const feature of features) {
+    for await (let feature of features) {
       if (total % 1000 === 0) {
+        console.info('Memory usage:', process.memoryUsage())
         console.info(
           'Saving features',
           'total',
@@ -100,6 +101,7 @@ export abstract class DatagovukFetcher<
         totalUpdated++
       }
       total++
+      feature = null // Help GC by releasing reference
     }
     console.info(
       'Saved all features',
