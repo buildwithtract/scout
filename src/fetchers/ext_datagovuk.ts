@@ -83,7 +83,6 @@ export abstract class DatagovukFetcher<
     let totalUpdated = 0
     for await (let feature of features) {
       if (total % 1000 === 0) {
-        console.info('Memory usage:', process.memoryUsage())
         console.info(
           'Saving features',
           'total',

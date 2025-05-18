@@ -153,7 +153,7 @@ export const HoverInfoBox = ({ features, position }: HoverInfoBoxProps) => {
               className="inline-block h-4 w-4 rounded-full border-2"
               style={{
                 backgroundColor:
-                  mapSources[feature.mapSourceId].fill.default.color ?? '#000',
+                  mapSources[feature.mapSourceId].fill?.default.color ?? '#000',
                 borderColor:
                   mapSources[feature.mapSourceId].line.default.color ?? '#000'
               }}
