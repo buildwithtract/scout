@@ -12,6 +12,17 @@ const config = [
   eslintConfigPrettier,
   ...tseslint.configs.recommended,
   {
+    rules: {
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_'
+        }
+      ]
+    }
+  },
+  {
     plugins: {
       'only-warn': onlyWarn
     }
