@@ -1,5 +1,5 @@
 'use client'
-import { MapSourceId } from './googlemap/config'
+import { MapSourceId, mapSources } from './googlemap/config'
 
 // Custom type for hover info
 export type HoveredFeature = {
@@ -148,8 +148,17 @@ export const HoverInfoBox = ({ features, position }: HoverInfoBoxProps) => {
           key={`${feature.mapSourceId}-${index}`}
           className={index > 0 ? 'mt-2 border-t border-gray-200 pt-2' : ''}
         >
-          <div className="text-sm font-bold text-blue-600">
-            {feature.layerName}
+          <div className="flex items-center gap-1 text-sm font-bold">
+            <span
+              className="inline-block h-4 w-4 rounded-full border-2"
+              style={{
+                backgroundColor:
+                  mapSources[feature.mapSourceId].fill.default.color ?? '#000',
+                borderColor:
+                  mapSources[feature.mapSourceId].line.default.color ?? '#000'
+              }}
+            ></span>
+            <span>{feature.layerName}</span>
           </div>
           <div className="space-y-1 text-xs">
             {getKeyProperties(feature).map(({ key, value }, i) => (
