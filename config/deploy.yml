@@ -7,7 +7,9 @@ servers:
 
 proxy:
   ssl: true
-  host: scout.buildwithtract.com
+  hosts:
+    - scout.buildwithtract.com
+    - scout.britishprogress.org
 
 registry:
   server: ghcr.io
