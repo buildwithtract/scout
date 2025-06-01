@@ -1,6 +1,7 @@
 'use client'
 
 import CentreForBritishProgress from '@/assets/CentreForBritishProgress.svg'
+import Github from '@/assets/Github.svg'
 import House from '@/assets/House.svg'
 import Tract from '@/assets/Tract.svg'
 import { Button } from '@/components/buttons'
@@ -13,7 +14,7 @@ import { MapProvider } from '@/components/googlemap/context'
 import { GoogleMap, TractMapProps } from '@/components/googlemap/map'
 import { MapLegend } from '@/components/map-legend'
 import { useUrlPersistedState } from '@/lib/hooks/useUrlPersistedState'
-import { Menu, X } from 'lucide-react'
+import { Database, Menu, Minimize2, PlusCircle, X } from 'lucide-react'
 import Link from 'next/link'
 import {
   Suspense,
@@ -177,7 +178,7 @@ const Scout = () => {
     scrollRef: React.RefObject<HTMLDivElement | null>
   }) => (
     <>
-      <div className="flex flex-col gap-6 border-b p-8 text-center">
+      <div className="flex flex-col gap-2 p-2 text-center">
         <div className="flex flex-row items-center justify-between px-8">
           <div className="flex w-1/2 items-center justify-start gap-3">
             <House height={35} />
@@ -195,10 +196,41 @@ const Scout = () => {
             British infrastructure and planning data
           </p>
         </div>
-        <div className="flex items-center justify-center">
-          <Link href="/data" className="link">
-            Explore Data
-          </Link>
+        <div className="flex flex-row items-center justify-between px-8">
+          <div className="flex w-1/2 items-center justify-start">
+            <Link
+              href="/data"
+              className="group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-brand-brown transition-all duration-200 hover:bg-brand-primary/10 hover:text-brand-primary"
+            >
+              <Database
+                width={20}
+                height={20}
+                className="transition-transform duration-200 group-hover:scale-110"
+              />
+              <span className="relative">
+                Data
+                <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-brand-primary transition-all duration-200 group-hover:w-full" />
+              </span>
+            </Link>
+          </div>
+          <div className="flex w-1/2 items-center justify-end gap-2">
+            <Link
+              href="https://github.com/buildwithtract/scout"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-brand-brown transition-all duration-200 hover:bg-brand-primary/10 hover:text-brand-primary"
+            >
+              <Github
+                height={20}
+                width={20}
+                className="transition-transform duration-200 group-hover:scale-110"
+              />
+              <span className="relative">
+                GitHub
+                <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-brand-primary transition-all duration-200 group-hover:w-full" />
+              </span>
+            </Link>
+          </div>
         </div>
       </div>
       <div
@@ -216,9 +248,27 @@ const Scout = () => {
               }
             }}
             variant="tertiary"
+            className="group relative overflow-hidden rounded-lg bg-brand-cream px-6 py-3 text-sm font-medium text-brand-brown shadow-sm transition-all duration-200 hover:bg-brand-primary hover:text-white hover:shadow-md"
           >
-            {layerKeysVisible.length == layerKeys.length ? 'Disable' : 'Enable'}{' '}
-            All
+            <span className="relative z-10 flex items-center gap-2">
+              {layerKeysVisible.length == layerKeys.length ? (
+                <Minimize2
+                  width={18}
+                  height={18}
+                  className="transition-transform duration-200 group-hover:rotate-180"
+                />
+              ) : (
+                <PlusCircle
+                  width={18}
+                  height={18}
+                  className="transition-transform duration-200 group-hover:rotate-180"
+                />
+              )}
+              {layerKeysVisible.length == layerKeys.length
+                ? 'Disable'
+                : 'Enable'}{' '}
+              All
+            </span>
           </Button>
         </div>
 
