@@ -1,6 +1,8 @@
 'use client'
 
+import CentreForBritishProgress from '@/assets/CentreForBritishProgress.svg'
 import House from '@/assets/House.svg'
+import Tract from '@/assets/Tract.svg'
 import { Button } from '@/components/buttons'
 import {
   gridInfrastructureGroup,
@@ -175,14 +177,28 @@ const Scout = () => {
     scrollRef: React.RefObject<HTMLDivElement | null>
   }) => (
     <>
-      <div className="flex flex-col gap-4 border-b p-6 text-center">
-        <div className="flex flex-row items-center justify-center gap-4">
-          <House height={30} />
-          <h1 className="text-22px select-none">scout</h1>
+      <div className="flex flex-col gap-6 border-b p-8 text-center">
+        <div className="flex flex-row items-center justify-between px-8">
+          <div className="flex w-1/2 items-center justify-start gap-3">
+            <House height={35} />
+            <Tract height={35} width={100} />
+          </div>
+          <div className="flex w-1/2 items-center justify-end">
+            <CentreForBritishProgress height={60} width={180} />
+          </div>
         </div>
-        <div className="flex flex-col gap-4">
-          <p>Visualise UK planning data, on a map.</p>
-          <p className="italic">This tool is in beta.</p>
+        <div className="flex flex-col gap-2">
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+            SCOUT
+          </h1>
+          <p className="text-md mx-auto max-w-md leading-relaxed">
+            British infrastructure and planning data
+          </p>
+        </div>
+        <div className="flex items-center justify-center">
+          <Link href="/data" className="link">
+            Explore Data
+          </Link>
         </div>
       </div>
       <div
@@ -228,22 +244,6 @@ const Scout = () => {
           currentZoom={zoomLevel}
           minZoomLevels={minZoomsScout}
         />
-      </div>
-      <div className="flex items-center justify-center gap-4 border-t p-6 text-center text-sm">
-        <p>
-          <Link
-            href="https://buildwithtract.com/"
-            className="link"
-            target="_blank"
-          >
-            Built By Tract
-          </Link>
-        </p>
-        <p>
-          <Link href="/data" className="link">
-            Data
-          </Link>
-        </p>
       </div>
     </>
   )
