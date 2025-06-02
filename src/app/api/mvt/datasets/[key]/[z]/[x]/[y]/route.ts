@@ -1,4 +1,4 @@
-import { getDbClient } from '@/db/singleton-client'
+import { getCompatibleClient } from '@/db/connection-pool'
 import { Dataset, getDataset } from './queries'
 
 export async function GET(
@@ -34,7 +34,7 @@ export async function GET(
     return new Response('Invalid dataset', { status: 400 })
   }
 
-  const client = await getDbClient()
+  const client = await getCompatibleClient()
 
   try {
     const result = await getDataset(client, key as Dataset, {
@@ -59,6 +59,9 @@ export async function GET(
   } catch (error) {
     console.error('Error generating MVT:', error)
     return new Response('Failed to generate tile', { status: 500 })
+  } finally {
+    // IMPORTANT: Always release the client back to the pool
+    ;(client as any).release()
   }
 }
 
