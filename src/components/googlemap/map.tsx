@@ -5,7 +5,6 @@ import { load } from '@loaders.gl/core'
 import { Map } from '@vis.gl/react-google-maps'
 import {
   Color,
-  Deck,
   DeckGLProps,
   DeckProps,
   GeoJsonLayer,
@@ -120,6 +119,7 @@ export const GoogleMap = ({
   >()
 
   const containerRef = useRef<HTMLDivElement>(null)
+  const deckRef = useRef<any>(null) // Add proper ref for deck instance
 
   const [containerSize, setContainerSize] = useState<{
     width: number
@@ -406,6 +406,13 @@ export const GoogleMap = ({
     onUpdateViewState?.(viewState)
   }, [viewState])
 
+  // Clean up deck ref on unmount
+  useEffect(() => {
+    return () => {
+      deckRef.current = null
+    }
+  }, [])
+
   if (!initialVState) {
     return null
   }
@@ -465,10 +472,10 @@ export const GoogleMap = ({
                 })
               }
             }}
-            ref={(deckRef: any) => {
-              // Store the deck ref for picking objects
-              if (deckRef) {
-                ;(window as any).__deckRef = deckRef
+            ref={(deck: any) => {
+              // Store the deck ref locally instead of on window
+              if (deck) {
+                deckRef.current = deck
               }
             }}
             onDragStart={() => {
@@ -500,10 +507,8 @@ export const GoogleMap = ({
                 }
 
                 // 2. If deck is available, try pickObjects to find *additional* layers
-                if ((window as any).__deckRef) {
-                  const pickedObjects = (
-                    (window as any).__deckRef as Deck
-                  ).pickMultipleObjects({
+                if (deckRef.current) {
+                  const pickedObjects = deckRef.current.pickMultipleObjects({
                     x: info.x,
                     y: info.y,
                     radius: 5, // Keep 5x5 picking radius

@@ -77,17 +77,21 @@ const Scout = () => {
     lng: -1.465
   })
 
+  // Track if we've already attempted to get the position
+  const [hasAttemptedGeolocation, setHasAttemptedGeolocation] = useState(false)
+
   useEffect(() => {
     if (!('geolocation' in navigator)) return
-    if (currentPosition) return
+    if (hasAttemptedGeolocation) return
 
+    setHasAttemptedGeolocation(true)
     navigator.geolocation.getCurrentPosition((position) => {
       setCurrentPosition({
         lat: position.coords.latitude,
         lng: position.coords.longitude
       })
     })
-  })
+  }, [hasAttemptedGeolocation]) // Proper dependency array
 
   const [at, setAt] = useUrlPersistedState(
     'at',

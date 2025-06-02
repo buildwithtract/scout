@@ -1,7 +1,19 @@
 import { Client } from 'pg'
 
+// WARNING: The singleton pattern below can cause connection leaks in serverless/edge environments
+// Consider using a connection pool or creating new connections per request
+
 /**
  * Singleton class to manage database connections.
+ *
+ * ⚠️ IMPORTANT: This pattern can cause memory leaks in Next.js server components and API routes
+ * because connections are never released. Each request may create or reuse a connection that
+ * persists in memory.
+ *
+ * For production use, consider:
+ * 1. Using a connection pool (pg.Pool)
+ * 2. Creating connections per-request with proper cleanup
+ * 3. Using a database proxy service for serverless environments
  */
 class DatabaseConnection {
   private static instance: DatabaseConnection
