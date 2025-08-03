@@ -885,6 +885,70 @@ CREATE TABLE public.ext_naturalengland_nutrient_neutrality_catchments (
 
 
 --
+-- Name: ext_nged_11kv_overhead_lines; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.ext_nged_11kv_overhead_lines (
+    uuid uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    voltage integer,
+    situation public.situation,
+    geometry public.geometry NOT NULL,
+    geometry_3857 public.geometry NOT NULL,
+    geometry_27700 public.geometry NOT NULL,
+    first_imported_at timestamp without time zone DEFAULT now() NOT NULL,
+    last_imported_at timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: ext_nged_132kv_overhead_lines; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.ext_nged_132kv_overhead_lines (
+    uuid uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    voltage integer,
+    situation public.situation,
+    geometry public.geometry NOT NULL,
+    geometry_3857 public.geometry NOT NULL,
+    geometry_27700 public.geometry NOT NULL,
+    first_imported_at timestamp without time zone DEFAULT now() NOT NULL,
+    last_imported_at timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: ext_nged_33kv_overhead_lines; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.ext_nged_33kv_overhead_lines (
+    uuid uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    voltage integer,
+    situation public.situation,
+    geometry public.geometry NOT NULL,
+    geometry_3857 public.geometry NOT NULL,
+    geometry_27700 public.geometry NOT NULL,
+    first_imported_at timestamp without time zone DEFAULT now() NOT NULL,
+    last_imported_at timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: ext_nged_66kv_overhead_lines; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.ext_nged_66kv_overhead_lines (
+    uuid uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    voltage integer,
+    situation public.situation,
+    geometry public.geometry NOT NULL,
+    geometry_3857 public.geometry NOT NULL,
+    geometry_27700 public.geometry NOT NULL,
+    first_imported_at timestamp without time zone DEFAULT now() NOT NULL,
+    last_imported_at timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+--
 -- Name: ext_nged_substations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1416,6 +1480,56 @@ UNION ALL
     'ENW'::public.dno AS dno
    FROM public.ext_enw_low_voltage_overhead_lines
 UNION ALL
+ SELECT ext_nged_11kv_overhead_lines.uuid,
+    ext_nged_11kv_overhead_lines.geometry,
+    ext_nged_11kv_overhead_lines.geometry_3857,
+    ext_nged_11kv_overhead_lines.voltage,
+    ext_nged_11kv_overhead_lines.situation,
+    ext_nged_11kv_overhead_lines.first_imported_at,
+    ext_nged_11kv_overhead_lines.last_imported_at,
+    'NGED'::public.dno AS dno
+   FROM public.ext_nged_11kv_overhead_lines
+UNION ALL
+ SELECT ext_nged_33kv_overhead_lines.uuid,
+    ext_nged_33kv_overhead_lines.geometry,
+    ext_nged_33kv_overhead_lines.geometry_3857,
+    ext_nged_33kv_overhead_lines.voltage,
+    ext_nged_33kv_overhead_lines.situation,
+    ext_nged_33kv_overhead_lines.first_imported_at,
+    ext_nged_33kv_overhead_lines.last_imported_at,
+    'NGED'::public.dno AS dno
+   FROM public.ext_nged_33kv_overhead_lines
+UNION ALL
+ SELECT ext_nged_66kv_overhead_lines.uuid,
+    ext_nged_66kv_overhead_lines.geometry,
+    ext_nged_66kv_overhead_lines.geometry_3857,
+    ext_nged_66kv_overhead_lines.voltage,
+    ext_nged_66kv_overhead_lines.situation,
+    ext_nged_66kv_overhead_lines.first_imported_at,
+    ext_nged_66kv_overhead_lines.last_imported_at,
+    'NGED'::public.dno AS dno
+   FROM public.ext_nged_66kv_overhead_lines
+UNION ALL
+ SELECT ext_nged_132kv_overhead_lines.uuid,
+    ext_nged_132kv_overhead_lines.geometry,
+    ext_nged_132kv_overhead_lines.geometry_3857,
+    ext_nged_132kv_overhead_lines.voltage,
+    ext_nged_132kv_overhead_lines.situation,
+    ext_nged_132kv_overhead_lines.first_imported_at,
+    ext_nged_132kv_overhead_lines.last_imported_at,
+    'NGED'::public.dno AS dno
+   FROM public.ext_nged_132kv_overhead_lines
+UNION ALL
+ SELECT ext_nget_overhead_lines.uuid,
+    ext_nget_overhead_lines.geometry,
+    ext_nget_overhead_lines.geometry_3857,
+    ext_nget_overhead_lines.voltage,
+    ext_nget_overhead_lines.situation,
+    ext_nget_overhead_lines.first_imported_at,
+    ext_nget_overhead_lines.last_imported_at,
+    'NGET'::public.dno AS dno
+   FROM public.ext_nget_overhead_lines
+UNION ALL
  SELECT ext_npg_extra_high_voltage_lines.uuid,
     ext_npg_extra_high_voltage_lines.geometry,
     ext_npg_extra_high_voltage_lines.geometry_3857,
@@ -1436,6 +1550,16 @@ UNION ALL
     'NPG'::public.dno AS dno
    FROM public.ext_npg_high_voltage_overhead_lines
 UNION ALL
+ SELECT ext_npg_low_voltage_overhead_lines.uuid,
+    ext_npg_low_voltage_overhead_lines.geometry,
+    ext_npg_low_voltage_overhead_lines.geometry_3857,
+    ext_npg_low_voltage_overhead_lines.voltage,
+    ext_npg_low_voltage_overhead_lines.situation,
+    ext_npg_low_voltage_overhead_lines.first_imported_at,
+    ext_npg_low_voltage_overhead_lines.last_imported_at,
+    'NPG'::public.dno AS dno
+   FROM public.ext_npg_low_voltage_overhead_lines
+UNION ALL
  SELECT ext_ssen_transmission_overhead_line_supergrid.uuid,
     ext_ssen_transmission_overhead_line_supergrid.geometry,
     ext_ssen_transmission_overhead_line_supergrid.geometry_3857,
@@ -1455,26 +1579,6 @@ UNION ALL
     ext_ssen_transmission_overhead_line_grid.last_imported_at,
     'SSEN'::public.dno AS dno
    FROM public.ext_ssen_transmission_overhead_line_grid
-UNION ALL
- SELECT ext_nget_overhead_lines.uuid,
-    ext_nget_overhead_lines.geometry,
-    ext_nget_overhead_lines.geometry_3857,
-    ext_nget_overhead_lines.voltage,
-    ext_nget_overhead_lines.situation,
-    ext_nget_overhead_lines.first_imported_at,
-    ext_nget_overhead_lines.last_imported_at,
-    'NGET'::public.dno AS dno
-   FROM public.ext_nget_overhead_lines
-UNION ALL
- SELECT ext_npg_low_voltage_overhead_lines.uuid,
-    ext_npg_low_voltage_overhead_lines.geometry,
-    ext_npg_low_voltage_overhead_lines.geometry_3857,
-    ext_npg_low_voltage_overhead_lines.voltage,
-    ext_npg_low_voltage_overhead_lines.situation,
-    ext_npg_low_voltage_overhead_lines.first_imported_at,
-    ext_npg_low_voltage_overhead_lines.last_imported_at,
-    'NPG'::public.dno AS dno
-   FROM public.ext_npg_low_voltage_overhead_lines
 UNION ALL
  SELECT ext_ukpn_132kv_overhead_lines.uuid,
     ext_ukpn_132kv_overhead_lines.geometry,
@@ -2605,6 +2709,174 @@ CREATE UNIQUE INDEX ext_enw_substations_uuid ON public.ext_enw_substations USING
 
 
 --
+-- Name: ext_nged_11kv_overhead_lines_geometry_27700_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ext_nged_11kv_overhead_lines_geometry_27700_idx ON public.ext_nged_11kv_overhead_lines USING gist (geometry_27700);
+
+
+--
+-- Name: ext_nged_11kv_overhead_lines_geometry_3857_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ext_nged_11kv_overhead_lines_geometry_3857_idx ON public.ext_nged_11kv_overhead_lines USING gist (geometry_3857);
+
+
+--
+-- Name: ext_nged_11kv_overhead_lines_geometry_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ext_nged_11kv_overhead_lines_geometry_idx ON public.ext_nged_11kv_overhead_lines USING gist (geometry);
+
+
+--
+-- Name: ext_nged_11kv_overhead_lines_situation_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ext_nged_11kv_overhead_lines_situation_idx ON public.ext_nged_11kv_overhead_lines USING btree (situation);
+
+
+--
+-- Name: ext_nged_11kv_overhead_lines_uuid; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX ext_nged_11kv_overhead_lines_uuid ON public.ext_nged_11kv_overhead_lines USING btree (uuid);
+
+
+--
+-- Name: ext_nged_11kv_overhead_lines_voltage_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ext_nged_11kv_overhead_lines_voltage_idx ON public.ext_nged_11kv_overhead_lines USING btree (voltage);
+
+
+--
+-- Name: ext_nged_132kv_overhead_lines_geometry_27700_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ext_nged_132kv_overhead_lines_geometry_27700_idx ON public.ext_nged_132kv_overhead_lines USING gist (geometry_27700);
+
+
+--
+-- Name: ext_nged_132kv_overhead_lines_geometry_3857_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ext_nged_132kv_overhead_lines_geometry_3857_idx ON public.ext_nged_132kv_overhead_lines USING gist (geometry_3857);
+
+
+--
+-- Name: ext_nged_132kv_overhead_lines_geometry_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ext_nged_132kv_overhead_lines_geometry_idx ON public.ext_nged_132kv_overhead_lines USING gist (geometry);
+
+
+--
+-- Name: ext_nged_132kv_overhead_lines_situation_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ext_nged_132kv_overhead_lines_situation_idx ON public.ext_nged_132kv_overhead_lines USING btree (situation);
+
+
+--
+-- Name: ext_nged_132kv_overhead_lines_uuid; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX ext_nged_132kv_overhead_lines_uuid ON public.ext_nged_132kv_overhead_lines USING btree (uuid);
+
+
+--
+-- Name: ext_nged_132kv_overhead_lines_voltage_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ext_nged_132kv_overhead_lines_voltage_idx ON public.ext_nged_132kv_overhead_lines USING btree (voltage);
+
+
+--
+-- Name: ext_nged_33kv_overhead_lines_geometry_27700_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ext_nged_33kv_overhead_lines_geometry_27700_idx ON public.ext_nged_33kv_overhead_lines USING gist (geometry_27700);
+
+
+--
+-- Name: ext_nged_33kv_overhead_lines_geometry_3857_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ext_nged_33kv_overhead_lines_geometry_3857_idx ON public.ext_nged_33kv_overhead_lines USING gist (geometry_3857);
+
+
+--
+-- Name: ext_nged_33kv_overhead_lines_geometry_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ext_nged_33kv_overhead_lines_geometry_idx ON public.ext_nged_33kv_overhead_lines USING gist (geometry);
+
+
+--
+-- Name: ext_nged_33kv_overhead_lines_situation_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ext_nged_33kv_overhead_lines_situation_idx ON public.ext_nged_33kv_overhead_lines USING btree (situation);
+
+
+--
+-- Name: ext_nged_33kv_overhead_lines_uuid; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX ext_nged_33kv_overhead_lines_uuid ON public.ext_nged_33kv_overhead_lines USING btree (uuid);
+
+
+--
+-- Name: ext_nged_33kv_overhead_lines_voltage_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ext_nged_33kv_overhead_lines_voltage_idx ON public.ext_nged_33kv_overhead_lines USING btree (voltage);
+
+
+--
+-- Name: ext_nged_66kv_overhead_lines_geometry_27700_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ext_nged_66kv_overhead_lines_geometry_27700_idx ON public.ext_nged_66kv_overhead_lines USING gist (geometry_27700);
+
+
+--
+-- Name: ext_nged_66kv_overhead_lines_geometry_3857_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ext_nged_66kv_overhead_lines_geometry_3857_idx ON public.ext_nged_66kv_overhead_lines USING gist (geometry_3857);
+
+
+--
+-- Name: ext_nged_66kv_overhead_lines_geometry_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ext_nged_66kv_overhead_lines_geometry_idx ON public.ext_nged_66kv_overhead_lines USING gist (geometry);
+
+
+--
+-- Name: ext_nged_66kv_overhead_lines_situation_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ext_nged_66kv_overhead_lines_situation_idx ON public.ext_nged_66kv_overhead_lines USING btree (situation);
+
+
+--
+-- Name: ext_nged_66kv_overhead_lines_uuid; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX ext_nged_66kv_overhead_lines_uuid ON public.ext_nged_66kv_overhead_lines USING btree (uuid);
+
+
+--
+-- Name: ext_nged_66kv_overhead_lines_voltage_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ext_nged_66kv_overhead_lines_voltage_idx ON public.ext_nged_66kv_overhead_lines USING btree (voltage);
+
+
+--
 -- Name: ext_nged_substations_geometry_3857_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3382,6 +3654,34 @@ CREATE TRIGGER transform_geometry_trigger BEFORE INSERT OR UPDATE ON public.ext_
 
 
 --
+-- Name: ext_nged_11kv_overhead_lines transform_geometry_trigger; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER transform_geometry_trigger BEFORE INSERT OR UPDATE ON public.ext_nged_11kv_overhead_lines FOR EACH ROW EXECUTE FUNCTION public.transform_geometry();
+
+
+--
+-- Name: ext_nged_132kv_overhead_lines transform_geometry_trigger; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER transform_geometry_trigger BEFORE INSERT OR UPDATE ON public.ext_nged_132kv_overhead_lines FOR EACH ROW EXECUTE FUNCTION public.transform_geometry();
+
+
+--
+-- Name: ext_nged_33kv_overhead_lines transform_geometry_trigger; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER transform_geometry_trigger BEFORE INSERT OR UPDATE ON public.ext_nged_33kv_overhead_lines FOR EACH ROW EXECUTE FUNCTION public.transform_geometry();
+
+
+--
+-- Name: ext_nged_66kv_overhead_lines transform_geometry_trigger; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER transform_geometry_trigger BEFORE INSERT OR UPDATE ON public.ext_nged_66kv_overhead_lines FOR EACH ROW EXECUTE FUNCTION public.transform_geometry();
+
+
+--
 -- Name: ext_nget_overhead_lines transform_geometry_trigger; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -3545,6 +3845,7 @@ INSERT INTO public.goose_db_version ("version_id", "is_applied") VALUES (0, true
 INSERT INTO public.goose_db_version ("version_id", "is_applied") VALUES (20250423092753, true);
 INSERT INTO public.goose_db_version ("version_id", "is_applied") VALUES (20250517123430, true);
 INSERT INTO public.goose_db_version ("version_id", "is_applied") VALUES (20250517154514, true);
+INSERT INTO public.goose_db_version ("version_id", "is_applied") VALUES (20250607153000, true);
 
 
 --

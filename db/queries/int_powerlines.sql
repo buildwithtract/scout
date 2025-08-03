@@ -22,6 +22,7 @@ WITH
                     ip.geometry_3857,
                     CASE
                         WHEN sqlc.arg (z) >= 12 THEN 0
+                        WHEN ST_NPoints (ip.geometry_3857) > 100 THEN GREATEST(2.0, POWER(2, 20 - sqlc.arg (z)) / 2)
                         ELSE GREATEST(0.5, POWER(2, 20 - sqlc.arg (z)) / 4)
                     END
                 ),

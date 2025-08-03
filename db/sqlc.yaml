@@ -43,6 +43,10 @@ sql:
       - queries/ext_nget_towers.sql
       - queries/ext_naturalengland_nutrient_neutrality_catchments.sql
       - queries/ext_nged_substations.sql
+      - queries/ext_nged_11kv_overhead_lines.sql
+      - queries/ext_nged_33kv_overhead_lines.sql
+      - queries/ext_nged_66kv_overhead_lines.sql
+      - queries/ext_nged_132kv_overhead_lines.sql
       - queries/ext_npg_dnos.sql
       - queries/ext_npg_extra_high_voltage_lines.sql
       - queries/ext_npg_high_voltage_overhead_lines.sql

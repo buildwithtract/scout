@@ -28,6 +28,7 @@ WITH
                     ip.geometry_3857,
                     CASE
                         WHEN $1 >= 12 THEN 0
+                        WHEN ST_NPoints(ip.geometry_3857) > 100 THEN GREATEST(2.0, POWER(2, 20 - $1) / 2)
                         ELSE GREATEST(0.5, POWER(2, 20 - $1) / 4)
                     END
                 ),
