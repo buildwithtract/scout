@@ -197,7 +197,7 @@ const Scout = () => {
             SCOUT
           </h1>
           <p className="text-md mx-auto max-w-md leading-relaxed">
-            British infrastructure and planning data
+            British infrastructure and planning data.
           </p>
         </div>
         <div className="flex flex-row items-center justify-between px-8">
