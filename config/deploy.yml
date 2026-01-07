@@ -36,7 +36,7 @@ builder:
 env:
   clear:
     NEXT_PUBLIC_GIT_SHA: TODO
-    DATABASE_URL: postgres://postgres:postgres@scout-db:5432/postgres
+    DATABASE_URL: postgres://postgres:BPWrJhnMPdxBJpnWUnap1cp0lTZDWF@scout-db:5432/postgres
   secret:
     - JWT_SECRET_KEY
     - NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
@@ -55,7 +55,7 @@ accessories:
     env:
       clear:
         POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: postgres
+        POSTGRES_PASSWORD: BPWrJhnMPdxBJpnWUnap1cp0lTZDWF
         POSTGRES_DB: postgres
     files:
       - db/init-schema.sql:/docker-entrypoint-initdb.d/init-schema.sql
