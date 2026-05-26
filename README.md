@@ -150,34 +150,33 @@ make server-migrate-down   # rolls back one migration
 
 ## Keys, secrets & accounts
 
+> **Migrated to CBP Infisical on 2026-05-26.** All secrets below now live in the CBP-owned Infisical account (`contact@britishprogress.org`, **EU Cloud** — `https://eu.infisical.com`), project **`scout`**, environment **`prod`**. They are no longer read from Freddie's Bitwarden. See `HANDOVER_SECRETS_MIGRATION.md` for the full record.
+
 | Service | Purpose | Account owner | Where the key lives now | Notes |
 |---|---|---|---|---|
-| GitHub Container Registry | Push/pull Docker images | buildwithtract GitHub org | Freddie's Bitwarden (key: `KAMAL_REGISTRY_PASSWORD`) | Must move to Infisical |
-| Google Maps | Map display tiles | Freddie's personal Google Cloud | Freddie's Bitwarden (`NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`) | **Must move to a CBP-owned Google Cloud account AND Infisical** |
-| PostgreSQL | Database password | Freddie / Hetzner | Hardcoded in `config/deploy.yml` in git | Low-risk (DB is 127.0.0.1 only) but should move to Infisical |
-| JWT signing | Scout's own auth tokens | N/A | Freddie's Bitwarden (`JWT_SECRET_KEY`) | Must move to Infisical |
-| DNOS ENW | Electricity North West data | ENW | Freddie's Bitwarden (`DNOS_ENW_API_KEY`) | Must move to Infisical |
-| DNOS UKPN | UK Power Networks data | UKPN | Freddie's Bitwarden (`DNOS_UKPN_API_KEY`) | Must move to Infisical |
-| DNOS NGED | National Grid Electricity Distribution | NGED | Freddie's Bitwarden (`DNOS_NGED_API_KEY`) | Must move to Infisical |
-| DNOS NPG | Northern Powergrid | NPG | Freddie's Bitwarden (`DNOS_NPG_API_KEY`) | Must move to Infisical |
-| DNOS SPEN | SP Energy Networks | SPEN | Freddie's Bitwarden (`DNOS_SPEN_API_KEY`) | Must move to Infisical |
-| DNOS SSEN | Scottish & Southern Electricity Networks | SSEN | Freddie's Bitwarden (`DNOS_SSEN_API_KEY`) | Must move to Infisical |
+| GitHub Container Registry | Push/pull Docker images | **CBP GitHub org (`britishprogress`)** | Infisical `scout/prod` (`KAMAL_REGISTRY_PASSWORD`) | Image moved to `ghcr.io/britishprogress/scout`. Token is currently a PAT on the `vogon101` account (`write:packages`); consider a CBP-owned GitHub account long-term. |
+| Google Maps | Map display tiles | Freddie's personal Google Cloud | Infisical `scout/prod` (`NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`) | **Key value migrated, but the upstream Google Cloud *project* is still Freddie's personal account — reissue the key from a CBP-owned GCP account and replace the value.** |
+| PostgreSQL | Database password | Freddie / Hetzner | Infisical `scout/prod` (`POSTGRES_PASSWORD`, `DATABASE_URL`) | No longer hardcoded in `config/deploy.yml`. |
+| JWT signing | Scout's own auth tokens | N/A | Infisical `scout/prod` (`JWT_SECRET_KEY`) | Consider rotating (briefly existed in a temp file during migration). |
+| DNOS ENW | Electricity North West data | ENW | Infisical `scout/prod` (`DNOS_ENW_API_KEY`) | — |
+| DNOS UKPN | UK Power Networks data | UKPN | Infisical `scout/prod` (`DNOS_UKPN_API_KEY`) | — |
+| DNOS NGED | National Grid Electricity Distribution | NGED | Infisical `scout/prod` (`DNOS_NGED_API_KEY`) | — |
+| DNOS NPG | Northern Powergrid | NPG | Infisical `scout/prod` (`DNOS_NPG_API_KEY`) | — |
+| DNOS SPEN | SP Energy Networks | SPEN | Infisical `scout/prod` (`DNOS_SPEN_API_KEY`) | — |
+| DNOS SSEN | Scottish & Southern Electricity Networks | SSEN | Infisical `scout/prod` (`DNOS_SSEN_API_KEY`) | **Value is a placeholder (`todo`) carried over from Bitwarden — needs a real key for the SSEN fetcher to work.** |
 
 **Local dev:** Values live in `microsites/scout/.env` (gitignored). Copy from `.env.example` and fill in.
 
-**Production deploys:** Kamal reads secrets at deploy time by running `.kamal/secrets`, which currently calls Freddie's personal Bitwarden Secrets Manager vault via `bws`. This means only Freddie's machine can currently deploy Scout.
+**Production deploys:** Kamal reads secrets at deploy time by running `.kamal/secrets`, which logs in to CBP Infisical with the `scout-kamal-deploy` machine identity (Universal Auth) and fetches the `scout/prod` secrets. The machine-identity `INFISICAL_CLIENT_ID` / `INFISICAL_CLIENT_SECRET` live in `microsites/scout/.env` (gitignored). Any machine with those two values and the Infisical CLI can deploy — it is no longer tied to Freddie's Bitwarden.
 
-### When the owner leaves
+### Remaining handover follow-ups
 
-All of these secrets are currently tied to Freddie's personal accounts. A runbook for migrating them to a CBP-owned Infisical account (and moving the Google Maps key to a CBP Google Cloud account) is at:
+The Infisical migration itself is complete. Still outstanding (see `HANDOVER_SECRETS_MIGRATION.md` Part G + the Google Cloud section):
 
-> `/Users/freddieposer/projects/CBP/handover/HANDOVER_SECRETS_MIGRATION.md`
-
-**The most urgent items are:**
-
-1. The Google Maps key (`NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`) is on Freddie's personal Google Cloud account. If that account is closed or the key is deleted, the map stops rendering entirely. This key must move to a CBP-owned Google Cloud account.
-2. The Postgres password is hardcoded in `config/deploy.yml` (in git). It is not internet-exposed, but it should move to Infisical as part of the migration.
-3. Until the migration is complete, nobody other than Freddie can redeploy Scout or run fetchers remotely.
+1. **Google Maps key** (`NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`): the *value* is in Infisical, but it's still issued from Freddie's personal Google Cloud project. Reissue from a CBP-owned GCP account (Maps JavaScript API, HTTP-referrer-restricted to the two Scout hosts), update the value in Infisical, redeploy, delete the old key.
+2. **Revoke the old Bitwarden access** once you're confident: delete the Bitwarden Secrets Manager token/project and remove `BWS_ACCESS_TOKEN` from `microsites/scout/.env` (kept for now as a rollback path).
+3. **Rotate the sensitive keys** that briefly touched a file during migration (`JWT_SECRET_KEY`, DB password) — optional but recommended.
+4. **Registry token**: currently a PAT on the `vogon101` personal account. For a clean CBP handover, mint it from a CBP-owned GitHub account that's a member of the `britishprogress` org.
 
 ---
 
@@ -208,9 +207,7 @@ Use `bun run list-fetchers` to see exact names.
 
 **Deploy fails because it can't read secrets:**
 
-The `.kamal/secrets` file calls Bitwarden via `bws`. If the Bitwarden access token in `microsites/scout/.env` has expired or the vault item ID has changed, the deploy will fail. Check the runbook at `HANDOVER_SECRETS_MIGRATION.md` — if the migration to Infisical is complete, the Bitwarden section no longer applies.
-
-Note: `kamal secrets extract` is unreliable on Kamal 2.7.x. If a secret comes back blank, read it directly with `bws secret get <id>` and compare against what Kamal reports.
+The `.kamal/secrets` file logs in to CBP Infisical (EU Cloud) with the `scout-kamal-deploy` machine identity and fetches `scout/prod`. If the deploy can't read secrets, check, in order: (1) `INFISICAL_CLIENT_ID` / `INFISICAL_CLIENT_SECRET` are present in `microsites/scout/.env`; (2) the machine identity still has read access to the `scout` project's `prod` env; (3) `kamal secrets print` from `microsites/scout` lists every name with a value. The CLI must reach `https://eu.infisical.com` — every call in `.kamal/secrets` is pinned to that domain.
 
 ---
 
@@ -218,7 +215,7 @@ Note: `kamal secrets extract` is unreliable on Kamal 2.7.x. If a secret comes ba
 
 - `documentation/database/00_setup.md` and `01_migrations.md` both contain `# todo` stubs — the sections about `init-schema.sql`, `kamal remove`, `kamal setup`, and local migration testing are incomplete.
 - `documentation/new_layer.md` step 1 is noted as wrong ("We don't edit the schema file directly. How we will do migrations in Scout is TBC.") — the correct flow is to create a Goose migration, not to edit `db/schema.sql` by hand.
-- The Postgres password is in plaintext in `config/deploy.yml`. Low-risk (DB is not internet-facing) but should move to Infisical.
 - `NEXT_PUBLIC_GIT_SHA` in `config/deploy.yml` is set to the literal string `TODO` — it should be wired to the actual Kamal version or git SHA.
 - There is no staging environment. All deployments go directly to production.
-- `kamal secrets extract` is unreliable on the installed Kamal 2.7.x (known upstream issue).
+- The `goose-builder` stage in the `Dockerfile` installs `goose@latest` against a pinned `golang:1.25-alpine` base. `@latest` is unpinned, so a future goose release that requires Go > 1.25 will break the build again — pin a goose version when convenient.
+- The container image now publishes to `ghcr.io/britishprogress/scout` (CBP org). The old `ghcr.io/buildwithtract/scout` package is orphaned and can be deleted once the new one is confirmed working.

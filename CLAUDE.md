@@ -53,8 +53,8 @@ Browser
 | DB migrations | Goose (Go binary, bundled into Docker image from `golang:1.24-alpine`) |
 | Type-safe SQL | sqlc (`db/sqlc.yaml`, WASM plugin `sqlc-gen-typescript 0.1.3`) |
 | Deployment | Kamal 2.x → Docker → Hetzner VPS `157.180.79.13` |
-| Container registry | `ghcr.io/buildwithtract/scout` |
-| Secrets | Freddie's Bitwarden Secrets Manager → **migrating to CBP Infisical** |
+| Container registry | `ghcr.io/britishprogress/scout` (CBP org; moved from `buildwithtract` 2026-05-26) |
+| Secrets | **CBP Infisical** (EU Cloud, project `scout` / env `prod`) — migrated from Bitwarden 2026-05-26 |
 | Package manager | Bun (use `bun install`, not npm/yarn/pnpm) |
 
 ---
@@ -119,9 +119,9 @@ There are no automated tests in this repo. Verify changes manually by running lo
 
 4. **`src/db/index.ts` must re-export every generated module.** New generated files are not auto-exported.
 
-5. **`kamal secrets extract` is unreliable on Kamal 2.7.x.** If a secret appears blank during deploy, check it directly via `bws secret get <id>`. Known upstream issue.
+5. **Secrets resolve from CBP Infisical (EU Cloud), not Bitwarden.** `.kamal/secrets` logs in with the `scout-kamal-deploy` machine identity and runs one `infisical secrets get <NAME> --plain …` per secret. Every call is pinned to `--domain=https://eu.infisical.com` (the CBP account is on EU Cloud, not the US default). Do **not** use the `set -a; . file` sourcing pattern from the old runbook appendix — Kamal parses `.kamal/secrets` with dotenv, which only reads explicit `KEY=…` lines and ignores shell sourcing.
 
-6. **The Postgres password is in plaintext in `config/deploy.yml` (git).** `DATABASE_URL` is in the `env.clear` block and `POSTGRES_PASSWORD` is in the accessory `env.clear`. Low-risk (DB is `127.0.0.1` only). Scheduled to move to Infisical — see the secrets migration runbook.
+6. **The DB password is no longer in git.** `DATABASE_URL` (in `env.secret`) and `POSTGRES_PASSWORD` (accessory `env.secret`) are now Infisical secret refs, resolved at deploy time. Don't reintroduce plaintext values into `config/deploy.yml`.
 
 7. **`NEXT_PUBLIC_GIT_SHA` in `config/deploy.yml` is literally `TODO`.** It should be wired to `$KAMAL_VERSION`.
 
@@ -143,7 +143,7 @@ There are no automated tests in this repo. Verify changes manually by running lo
 
 ## Deployment
 
-**Tool:** Kamal 2.x. Config: `config/deploy.yml`. Secrets: `.kamal/secrets` (currently reads from Freddie's Bitwarden; migrating to Infisical — see runbook below).
+**Tool:** Kamal 2.x. Config: `config/deploy.yml`. Secrets: `.kamal/secrets` reads from CBP Infisical (EU Cloud) via the `scout-kamal-deploy` machine identity.
 
 ```bash
 # From microsites/scout, with secrets available:
@@ -155,13 +155,11 @@ kamal accessory start scout-db   # start DB container if stopped
 
 **Build:** Kamal builds the image on the Hetzner server itself (builder is `ssh://root@157.180.79.13`), not the local machine. Secrets are injected as Docker BuildKit secrets at image build time.
 
-**Secrets file:** `.kamal/secrets` is a shell script that Kamal sources before deploy. It currently calls:
-```bash
-SECRETS=$(kamal secrets fetch --adapter bitwarden-sm --account freddie.poser@gmail.com <vault-id>/all)
-```
-This only works on Freddie's machine with `BWS_ACCESS_TOKEN` in `.env`.
+**Secrets file:** `.kamal/secrets` (committed; contains no raw credentials) logs in to CBP Infisical with the machine identity and fetches each `scout/prod` secret. It needs `INFISICAL_CLIENT_ID` and `INFISICAL_CLIENT_SECRET` in `microsites/scout/.env` (gitignored) — these are the Universal Auth credentials of the `scout-kamal-deploy` machine identity. The Infisical "scout" project ID is hardcoded near the top of the file (it is not a secret). Build it/verify with `kamal secrets print` from `microsites/scout`.
 
-**After secrets migration:** `.kamal/secrets` will call Infisical with a machine identity. See runbook: `CBP/handover/HANDOVER_SECRETS_MIGRATION.md`, Part D, including the replacement `.kamal/secrets` file in the Appendix.
+**Image registry:** Built images push to `ghcr.io/britishprogress/scout` (CBP org), authenticated with `KAMAL_REGISTRY_PASSWORD` (a GitHub PAT with `write:packages`). `registry.username` in `config/deploy.yml` is the PAT owner's GitHub username.
+
+**Note (Kamal builds from committed git):** `kamal deploy` builds the image from a clean clone of the current `HEAD`, so **`Dockerfile` and app-code changes must be committed before they reach the build** (config files like `deploy.yml` / `.kamal/secrets` are read from the working tree, so those take effect uncommitted). Migration history and remaining follow-ups: `CBP/handover/HANDOVER_SECRETS_MIGRATION.md`.
 
 **Server access:**
 ```bash
@@ -176,7 +174,9 @@ docker logs <container> -f         # stream logs
 
 All required vars are in `.env.example`. Copy to `.env` for local dev.
 
-| Variable | Purpose | Current location | After migration |
+> **Migration done (2026-05-26):** the secret variables now live in CBP Infisical (EU Cloud) `scout/prod` — the **"After migration"** column below is the live state. For local dev they still come from `.env`. For **deploy**, `microsites/scout/.env` must also contain `INFISICAL_CLIENT_ID` and `INFISICAL_CLIENT_SECRET` (the `scout-kamal-deploy` machine identity). `BWS_ACCESS_TOKEN` is retained for now only as a rollback path and can be removed once the migration is trusted.
+
+| Variable | Purpose | Was (pre-migration) | Now (live) |
 |---|---|---|---|
 | `DATABASE_URL` | Postgres connection string | `.env` (local) / `config/deploy.yml` `env.clear` (prod — **in git**) | Infisical `scout/prod` |
 | `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` | DB container config | `.env` (local) / `config/deploy.yml` `accessories.db.env.clear` (**in git**) | `POSTGRES_PASSWORD` → Infisical |
@@ -241,7 +241,7 @@ kamal deploy          # build image on Hetzner, push to ghcr.io, restart contain
 kamal rollback        # revert to previous image
 ```
 
-Precondition: `microsites/scout/.env` must have a valid `BWS_ACCESS_TOKEN` (Bitwarden) or `INFISICAL_CLIENT_ID` / `INFISICAL_CLIENT_SECRET` (Infisical, after migration).
+Precondition: `microsites/scout/.env` must have valid `INFISICAL_CLIENT_ID` / `INFISICAL_CLIENT_SECRET` (the `scout-kamal-deploy` machine identity). Verify resolution first with `kamal secrets print`.
 
 ### Regenerate sqlc types
 
