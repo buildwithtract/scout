@@ -1,4 +1,4 @@
-FROM golang:1.24-alpine AS goose-builder
+FROM golang:1.25-alpine AS goose-builder
 RUN go install github.com/pressly/goose/v3/cmd/goose@latest
 
 FROM oven/bun:1.2.13 AS builder

@@ -1,5 +1,5 @@
 service: scout
-image: buildwithtract/scout
+image: britishprogress/scout
 
 servers:
   web:
@@ -13,7 +13,7 @@ proxy:
 
 registry:
   server: ghcr.io
-  username: buildwithtract
+  username: vogon101
   password:
     - KAMAL_REGISTRY_PASSWORD
 
@@ -36,8 +36,8 @@ builder:
 env:
   clear:
     NEXT_PUBLIC_GIT_SHA: TODO
-    DATABASE_URL: postgres://postgres:BPWrJhnMPdxBJpnWUnap1cp0lTZDWF@scout-db:5432/postgres
   secret:
+    - DATABASE_URL
     - JWT_SECRET_KEY
     - NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
     - DNOS_ENW_API_KEY
@@ -55,8 +55,9 @@ accessories:
     env:
       clear:
         POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: BPWrJhnMPdxBJpnWUnap1cp0lTZDWF
         POSTGRES_DB: postgres
+      secret:
+        - POSTGRES_PASSWORD
     files:
       - db/init-schema.sql:/docker-entrypoint-initdb.d/init-schema.sql
     directories:
