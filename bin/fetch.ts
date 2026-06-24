@@ -36,6 +36,10 @@ import { ExtEnw6Point6kvOverheadLines } from '@/fetchers/ext_enw_6_6kv_overhead_
 import { ExtEnwLowVoltageOverheadLines } from '@/fetchers/ext_enw_low_voltage_overhead_lines'
 import { ExtEnwSubstations } from '@/fetchers/ext_enw_substations'
 import { NutrientNeutralityCatchmentsFetcher } from '@/fetchers/ext_naturalengland_nutrient_neutrality_catchments'
+import { ExtNged11kvOverheadLines } from '@/fetchers/ext_nged_11kv_overhead_lines'
+import { ExtNged132kvOverheadLines } from '@/fetchers/ext_nged_132kv_overhead_lines'
+import { ExtNged33kvOverheadLines } from '@/fetchers/ext_nged_33kv_overhead_lines'
+import { ExtNged66kvOverheadLines } from '@/fetchers/ext_nged_66kv_overhead_lines'
 import { ExtNgetOverheadLines } from '@/fetchers/ext_nget_overhead_lines'
 import { ExtNgetSubstations } from '@/fetchers/ext_nget_substations'
 import { ExtNgetTowers } from '@/fetchers/ext_nget_towers'
@@ -122,6 +126,10 @@ export const fetchers: FetcherRegistry = {
   [getFetcherName(ExtNgetOverheadLines)]: ExtNgetOverheadLines,
   [getFetcherName(ExtNgetSubstations)]: ExtNgetSubstations,
   [getFetcherName(ExtNgetTowers)]: ExtNgetTowers,
+  [getFetcherName(ExtNged11kvOverheadLines)]: ExtNged11kvOverheadLines,
+  [getFetcherName(ExtNged33kvOverheadLines)]: ExtNged33kvOverheadLines,
+  [getFetcherName(ExtNged66kvOverheadLines)]: ExtNged66kvOverheadLines,
+  [getFetcherName(ExtNged132kvOverheadLines)]: ExtNged132kvOverheadLines,
   [getFetcherName(ExtNpgDnos)]: ExtNpgDnos,
   [getFetcherName(ExtNpgIndependentOperators)]: ExtNpgIndependentOperators,
   [getFetcherName(ExtNpgExtraHighVoltageLines)]: ExtNpgExtraHighVoltageLines,
